@@ -1,6 +1,7 @@
 DracoLinux a.k.a Draco GNU/Linux
 
-Copyright (c) 2006-2012 Ole Andre Rodlie <olear@dracolinux.org>
+Copyright (c) 2006-2014 Ole Andre Rodlie <olear@dracolinux.org>
+Copyright (c) 2013-2014 FxArena DA <mail@fxarena.net>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, 
@@ -25,4 +26,4 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABI
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Software included in this distribution are distributed under several licenses, mostly GPL and BSD. See "/usr/doc/<software>" for more information.
+DracoLinux is part of the Open Invention Network <http://www.openinventionnetwork.com/>.
