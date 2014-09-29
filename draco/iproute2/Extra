@@ -1,0 +1,2 @@
+mv $DRACOSRC_PKG/lib/tc/* $DRACOSRC_PKG/usr/lib/tc/ || exit 1
+rm -r $DRACOSRC_PKG/lib || exit 1

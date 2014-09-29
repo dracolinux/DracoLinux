@@ -1,0 +1,7 @@
+cat $DRACOSRC_PKG_SRC_DIR/lesspipe.sh > $DRACOSRC_PKG/usr/bin/lesspipe.sh || exit 1
+chmod 755 $DRACOSRC_PKG/usr/bin/lesspipe.sh
+
+( cd $DRACOSRC_PKG ;
+  mv usr/share/man usr/
+  rm -r usr/share
+)

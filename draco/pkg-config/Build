@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="pkg-config"
+DRACOSRC_PKG_VERSION="0.25"
+DRACOSRC_PKG_BUILD=6
+DRACOSRC_PKG_DESC="Manage compile/link flags"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --mandir=/usr/man"

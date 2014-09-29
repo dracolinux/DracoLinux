@@ -1,0 +1,7 @@
+
+make clean
+CFLAGS="${DRACOSRC_FLAGS}" CXXFLAGS="${DRACOSRC_FLAGS}" ./configure ${DRACOSRC_PKG_CONFIGURE_static} || exit 1
+make || exit 1
+install -D -m755 src/cryptsetup $DRACOSRC_PKG/sbin/cryptsetup.static || exit 1
+rm -rf $DRACOSRC_PKG/usr/lib/cryptsetup
+

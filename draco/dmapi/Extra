@@ -1,0 +1,13 @@
+
+make install-dev DESTDIR=$DRACOSRC_PKG || exit 1
+# ???
+make install DESTDIR=$DRACOSRC_PKG || exit 1
+
+( cd $DRACOSRC_PKG ;
+  mv usr/share/doc usr
+  ( cd usr/doc ; mv $DRACOSRC_PKG_NAME $DRACOSRC_PKG_NAME-$DRACOSRC_PKG_VERSION )
+  rm -f lib/*.a lib/libdm.so lib/*.la usr/lib/*.la
+  ( cd usr/lib ; rm -f libdm.so ; ln -sf ../../lib/libdm.so.0 libdm.so )
+)
+
+chmod 755 $DRACOSRC_PKG/lib/*

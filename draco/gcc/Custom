@@ -1,0 +1,32 @@
+mkdir build || exit 1
+cd build || exit 1
+CFLAGS="${DRACOSRC_FLAGS}" CXXFLAGS="${DRACOSRC_FLAGS}" ../configure ${DRACOSRC_PKG_CONFIGURE} || exit 1
+make -j3 || exit 1
+make install DESTDIR=${DRACOSRC_PKG} || exit 1
+
+if [ ! -z $DRACOSRC_PKG/usr/lib/gcc/$DRACOSRC_ARCH-draco-linux/$DRACOSRC_PKG_VERSION/specs ]; then
+  cat stage1-gcc/specs > $DRACOSRC_PKG/usr/lib/gcc/$DRACOSRC_ARCH-draco-linux/$DRACOSRC_PKG_VERSION/specs || exit 1
+fi
+
+( cd $DRACOSRC_PKG;
+  find . -name "lib*so*" -exec strip --strip-unneeded "{}" \;
+  find . -name "lib*a" -exec strip -g "{}" \;
+  strip --strip-unneeded usr/bin/* 2> /dev/null
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+)
+
+rm -f $DRACOSRC_PKG/usr/lib/libiberty.a || exit 1
+
+( cd $DRACOSRC_PKG;
+  mkdir -p lib
+  ( cd lib ; ln -sf ../usr/bin/cpp cpp )
+)
+
+if [ ! -x $DRACOSRC_PKG/usr/bin/cc ]; then
+  ( cd $DRACOSRC_PKG/usr/bin ; ln -sf gcc cc )
+fi
+
+# Needed by glibc 2.11
+#cat ../gcc/testsuite/gcc.dg/i386-cpuid.h > $DRACOSRC_PKG/usr/include/cpuid.h || exit 1
+

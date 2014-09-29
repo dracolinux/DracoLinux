@@ -1,0 +1,49 @@
+# Taken from Slackware
+# Modified for Draco
+
+cat $DRACOSRC_PKG_SRC_DIR/rc.nfsd > $DRACOSRC_PKG/etc/rc.d/rc.nfsd.new || exit 1
+
+# These might be in use:
+( cd $DRACOSRC_PKG/var/lib/nfs
+  for config_file in etab rmtab state xtab ; do
+    mv ${config_file} ${config_file}.new
+  done
+)
+
+# Why were we doing this?
+mv $DRACOSRC_PKG/usr/sbin/rpc.statd $DRACOSRC_PKG/sbin || exit 1
+( cd $DRACOSRC_PKG/usr/sbin ; ln -sf ../../sbin/rpc.statd . )
+
+mkdir -p $DRACOSRC_PKG/install
+cat << EOF > $DRACOSRC_PKG/install/doinst.sh
+#!/bin/sh
+config() {
+  NEW="\$1"
+  OLD="\$(dirname \$NEW)/\$(basename \$NEW .new)"
+  # If there's no config file by that name, mv it over:
+  if [ ! -r \$OLD ]; then
+    mv \$NEW \$OLD
+  elif [ "\$(cat \$OLD | md5sum)" = "\$(cat \$NEW | md5sum)" ]; then # toss the redundant copy
+    rm \$NEW
+  fi
+  # Otherwise, we leave the .new copy for the admin to consider...
+}
+EOF
+( cd $DRACOSRC_PKG/var/lib/nfs
+  for config_file in etab.new rmtab.new state.new xtab.new ; do
+    if [ -r ${config_file} ]; then
+      echo "config var/lib/nfs/${config_file}" >> $DRACOSRC_PKG/install/doinst.sh
+    fi
+  done
+)
+# If these aren't moved into place, they're junk:
+echo "rm -f var/lib/nfs/*.new" >> $DRACOSRC_PKG/install/doinst.sh
+cat << EOF >> $DRACOSRC_PKG/install/doinst.sh
+if [ -x etc/rc.d/rc.nfsd ]; then
+  chmod 755 etc/rc.d/rc.nfsd.new
+else
+  chmod 644 etc/rc.d/rc.nfsd.new
+fi
+config etc/rc.d/rc.nfsd.new
+config etc/exports.new
+EOF

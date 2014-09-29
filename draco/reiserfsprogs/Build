@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="reiserfsprogs"
+DRACOSRC_PKG_VERSION="3.6.21"
+DRACOSRC_PKG_BUILD=6
+DRACOSRC_PKG_DESC="ReiserFS utillities"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --mandir=/usr/man --build=$DRACOSRC_ARCH-draco-linux"

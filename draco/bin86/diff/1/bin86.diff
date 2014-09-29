@@ -1,0 +1,11 @@
+--- ./Makefile.orig	2002-03-20 14:03:38.000000000 -0800
++++ ./Makefile	2003-02-10 16:06:51.000000000 -0800
+@@ -3,7 +3,7 @@
+ LDFLAGS=
+ DIRS=ld as
+ 
+-PREFIX=/usr/local
++PREFIX=/usr
+ BINDIR=$(PREFIX)/bin
+ LIBDIR=$(PREFIX)/lib
+ MANDIR=$(PREFIX)/man/man1

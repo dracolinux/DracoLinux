@@ -1,0 +1,13 @@
+--- Makefile.orig	2012-12-21 05:46:36.619735150 +0100
++++ Makefile	2012-12-21 05:47:35.564997891 +0100
+@@ -3,8 +3,8 @@
+ LIBDIR=/usr/lib/
+ SBINDIR=/sbin
+ CONFDIR=/etc/iproute2
+-DOCDIR=/share/doc/iproute2
+-MANDIR=/share/man
++DOCDIR=/usr/doc/iproute2-2.6.33
++MANDIR=/usr/man
+ ARPDDIR=/var/lib/arpd
+ 
+ # Path to db_185.h include

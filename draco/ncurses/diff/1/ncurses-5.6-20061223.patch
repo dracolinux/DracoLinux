@@ -1,0 +1,1165 @@
+# ncurses 5.6 - patch 20061223 - Thomas E. Dickey
+#
+# ------------------------------------------------------------------------------
+#
+# Ncurses 5.6 is at
+# 	ftp.gnu.org:/pub/gnu
+#
+# Patches for ncurses 5.6 are in the subdirectory
+# 	ftp://invisible-island.net/ncurses/5.6
+#
+# patch by Thomas E. Dickey <dickey@invisible-island.net>
+# created  Sun Dec 24 02:11:39 UTC 2006
+# ------------------------------------------------------------------------------
+# MANIFEST                                     |    1 
+# NEWS                                         |    9 +-
+# aclocal.m4                                   |   14 +--
+# c++/modules                                  |    8 +
+# config.guess                                 |   16 ++-
+# config.sub                                   |   13 ++
+# configure                                    |   62 +++++++-------
+# configure.in                                 |    6 -
+# dist.mk                                      |    4 
+# form/modules                                 |    8 +
+# menu/modules                                 |    8 +
+# misc/Makefile.in                             |   10 +-
+# mk-1st.awk                                   |   44 +++++-----
+# ncurses-5.6-20061223/ncurses/tinfo/entries.c |  109 +++++++++++++++++++++++++
+# ncurses/modules                              |   24 +++--
+# ncurses/tinfo/comp_parse.c                   |   71 ----------------
+# panel/modules                                |    6 -
+# progs/modules                                |    8 +
+# tack/modules                                 |    7 +
+# test/modules                                 |    8 +
+# 20 files changed, 266 insertions(+), 170 deletions(-)
+# ------------------------------------------------------------------------------
+Index: MANIFEST
+--- ncurses-5.6-20061217+/MANIFEST	2006-11-26 02:21:05.000000000 +0000
++++ ncurses-5.6-20061223/MANIFEST	2006-12-24 01:00:58.000000000 +0000
+@@ -824,6 +824,7 @@
+ ./ncurses/tinfo/comp_scan.c
+ ./ncurses/tinfo/db_iterator.c
+ ./ncurses/tinfo/doalloc.c
++./ncurses/tinfo/entries.c
+ ./ncurses/tinfo/free_ttype.c
+ ./ncurses/tinfo/getenv_num.c
+ ./ncurses/tinfo/hashed_db.c
+Index: NEWS
+Prereq:  1.1056 
+--- ncurses-5.6-20061217+/NEWS	2006-12-17 20:36:26.000000000 +0000
++++ ncurses-5.6-20061223/NEWS	2006-12-24 00:50:10.000000000 +0000
+@@ -25,7 +25,7 @@
+ -- sale, use or other dealings in this Software without prior written        --
+ -- authorization.                                                            --
+ -------------------------------------------------------------------------------
+--- $Id: NEWS,v 1.1056 2006/12/17 20:36:26 tom Exp $
++-- $Id: NEWS,v 1.1058 2006/12/24 00:50:10 tom Exp $
+ -------------------------------------------------------------------------------
+ 
+ This is a log of changes that ncurses has gone through since Zeyd started
+@@ -45,6 +45,13 @@
+ Changes through 1.9.9e did not credit all contributions;
+ it is not possible to add this information.
+ 
++20061223 
++	+ modify configure script to omit the tic (terminfo compiler) support
++	  from ncurses library if --without-progs option is given.
++	+ modify install rule for ncurses5-config to do this via "install.libs"
++	+ modify shared-library rules to allow FreeBSD 3.x to use rpath.
++	+ update config.guess, config.sub
++
+ 20061217 5.6 release for upload to ftp.gnu.org
+ 
+ 20061217 
+Index: aclocal.m4
+Prereq:  1.407 
+--- ncurses-5.6-20061217+/aclocal.m4	2006-12-17 16:12:38.000000000 +0000
++++ ncurses-5.6-20061223/aclocal.m4	2006-12-23 23:07:35.000000000 +0000
+@@ -28,7 +28,7 @@
+ dnl
+ dnl Author: Thomas E. Dickey 1995-on
+ dnl
+-dnl $Id: aclocal.m4,v 1.407 2006/12/17 16:12:38 tom Exp $
++dnl $Id: aclocal.m4,v 1.408 2006/12/23 23:07:35 tom Exp $
+ dnl Macros used in NCURSES auto-configuration script.
+ dnl
+ dnl These macros are maintained separately from NCURSES.  The copyright on
+@@ -1852,7 +1852,7 @@
+ 	AC_SUBST(LIB_PREFIX)
+ ])dnl
+ dnl ---------------------------------------------------------------------------
+-dnl CF_LIB_RULES version: 40 updated: 2006/10/14 15:23:15
++dnl CF_LIB_RULES version: 41 updated: 2006/12/23 18:04:51
+ dnl ------------
+ dnl Append definitions and rules for the given models to the subdirectory
+ dnl Makefiles, and the recursion rule for the top-level Makefile.  If the
+@@ -2103,8 +2103,8 @@
+ 
+ cat >> Makefile <<CF_EOF
+ 
+-install.data \\
+-uninstall.data ::
++install.libs uninstall.libs \\
++install.data uninstall.data ::
+ $MAKE_TERMINFO	cd misc && \${MAKE} \${CF_MFLAGS} \[$]@
+ 
+ install.man \\
+@@ -3680,7 +3680,7 @@
+ 		-e 's/-[[UD]]$3\(=[[^ 	]]*\)\?[$]//g'`
+ ])dnl
+ dnl ---------------------------------------------------------------------------
+-dnl CF_SHARED_OPTS version: 41 updated: 2006/12/09 12:32:00
++dnl CF_SHARED_OPTS version: 42 updated: 2006/12/23 18:04:51
+ dnl --------------
+ dnl --------------
+ dnl Attempt to determine the appropriate CC/LD options for creating a shared
+@@ -3818,11 +3818,11 @@
+ 		CF_SHARED_SONAME
+ 		MK_SHARED_LIB='${CC} ${CFLAGS} -shared -Wl,-soname,'$cf_shared_soname',-stats,-lc -o $[@]'
+ 		;;
+-	openbsd2*)
++	openbsd[[2-9]].*)
+ 		CC_SHARED_OPTS="$CC_SHARED_OPTS -DPIC"
+ 		MK_SHARED_LIB='${LD} -Bshareable -soname,`basename $[@].${ABI_VERSION}` -o $[@]'
+ 		;;
+-	openbsd*|freebsd[[23]]*)
++	openbsd*|freebsd[[12]].*)
+ 		CC_SHARED_OPTS="$CC_SHARED_OPTS -DPIC"
+ 		MK_SHARED_LIB='${LD} -Bshareable -o $[@]'
+ 		test "$cf_cv_shlib_version" = auto && cf_cv_shlib_version=rel
+Index: c++/modules
+Prereq:  1.6 
+--- ncurses-5.6-20061217+/c++/modules	1999-07-31 09:46:54.000000000 +0000
++++ ncurses-5.6-20061223/c++/modules	2006-12-24 00:53:08.000000000 +0000
+@@ -1,7 +1,7 @@
+ # Program modules
+-# $Id: modules,v 1.6 1999/07/31 09:46:54 juergen Exp $
++# $Id: modules,v 1.7 2006/12/24 00:53:08 tom Exp $
+ ##############################################################################
+-# Copyright (c) 1998 Free Software Foundation, Inc.                          #
++# Copyright (c) 1998,2006 Free Software Foundation, Inc.                     #
+ #                                                                            #
+ # Permission is hereby granted, free of charge, to any person obtaining a    #
+ # copy of this software and associated documentation files (the "Software"), #
+@@ -28,7 +28,7 @@
+ # authorization.                                                             #
+ ##############################################################################
+ #
+-# Author: Thomas E. Dickey <dickey@clark.net> 1995,1997
++# Author: Thomas E. Dickey	1995-on
+ #
+ 
+ @ base
+@@ -41,3 +41,5 @@
+ cursesapp	c++		$(srcdir)	$(cursesapp_h)
+ cursesmain	c++		$(srcdir)	$(cursesapp_h)
+ demo		c++		$(srcdir)	$(cursesf_h) $(cursesm_h) $(cursesapp_h)
++
++# vile:makemode
+Index: config.guess
+--- ncurses-5.6-20061217+/config.guess	2006-07-22 15:57:37.000000000 +0000
++++ ncurses-5.6-20061223/config.guess	2006-12-22 17:00:00.000000000 +0000
+@@ -4,7 +4,7 @@
+ #   2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation,
+ #   Inc.
+ 
+-timestamp='2006-07-02'
++timestamp='2006-12-22'
+ 
+ # This file is free software; you can redistribute it and/or modify it
+ # under the terms of the GNU General Public License as published by
+@@ -161,6 +161,7 @@
+ 	    arm*) machine=arm-unknown ;;
+ 	    sh3el) machine=shl-unknown ;;
+ 	    sh3eb) machine=sh-unknown ;;
++	    sh5el) machine=sh5le-unknown ;;
+ 	    *) machine=${UNAME_MACHINE_ARCH}-unknown ;;
+ 	esac
+ 	# The Operating System including object format, if it has switched
+@@ -780,7 +781,7 @@
+     i*:CYGWIN*:*)
+ 	echo ${UNAME_MACHINE}-pc-cygwin
+ 	exit ;;
+-    i*:MINGW*:*)
++    *:MINGW*:*)
+ 	echo ${UNAME_MACHINE}-pc-mingw32
+ 	exit ;;
+     i*:windows32*:*)
+@@ -793,7 +794,7 @@
+     x86:Interix*:[3456]*)
+ 	echo i586-pc-interix${UNAME_RELEASE}
+ 	exit ;;
+-    EM64T:Interix*:[3456]*)
++    EM64T:Interix*:[3456]* | authenticamd:Interix*:[3456]*)
+ 	echo x86_64-unknown-interix${UNAME_RELEASE}
+ 	exit ;;
+     [345]86:Windows_95:* | [345]86:Windows_98:* | [345]86:Windows_NT:*)
+@@ -950,6 +951,9 @@
+     x86_64:Linux:*:*)
+ 	echo x86_64-unknown-linux-gnu
+ 	exit ;;
++    xtensa:Linux:*:*)
++    	echo xtensa-unknown-linux-gnu
++	exit ;;
+     i*86:Linux:*:*)
+ 	# The BFD linker knows what the default object file format is, so
+ 	# first see if it will tell us. cd to the root directory to prevent
+@@ -1208,6 +1212,12 @@
+     SX-6:SUPER-UX:*:*)
+ 	echo sx6-nec-superux${UNAME_RELEASE}
+ 	exit ;;
++    SX-7:SUPER-UX:*:*)
++	echo sx7-nec-superux${UNAME_RELEASE}
++	exit ;;
++    SX-8:SUPER-UX:*:*)
++	echo sx8-nec-superux${UNAME_RELEASE}
++	exit ;;
+     Power*:Rhapsody:*:*)
+ 	echo powerpc-apple-rhapsody${UNAME_RELEASE}
+ 	exit ;;
+Index: config.sub
+--- ncurses-5.6-20061217+/config.sub	2006-08-14 16:00:00.000000000 +0000
++++ ncurses-5.6-20061223/config.sub	2006-12-08 17:00:00.000000000 +0000
+@@ -4,7 +4,7 @@
+ #   2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation,
+ #   Inc.
+ 
+-timestamp='2006-08-14'
++timestamp='2006-12-08'
+ 
+ # This file is (in principle) common to ALL GNU software.
+ # The presence of a machine in this file suggests that SOME GNU software
+@@ -245,7 +245,7 @@
+ 	| bfin \
+ 	| c4x | clipper \
+ 	| d10v | d30v | dlx | dsp16xx \
+-	| fr30 | frv \
++	| fido | fr30 | frv \
+ 	| h8300 | h8500 | hppa | hppa1.[01] | hppa2.0 | hppa2.0[nw] | hppa64 \
+ 	| i370 | i860 | i960 | ia64 \
+ 	| ip2k | iq2000 \
+@@ -276,6 +276,7 @@
+ 	| pdp10 | pdp11 | pj | pjl \
+ 	| powerpc | powerpc64 | powerpc64le | powerpcle | ppcbe \
+ 	| pyramid \
++	| score \
+ 	| sh | sh[1234] | sh[24]a | sh[23]e | sh[34]eb | sheb | shbe | shle | sh[1234]le | sh3ele \
+ 	| sh64 | sh64le \
+ 	| sparc | sparc64 | sparc64b | sparc64v | sparc86x | sparclet | sparclite \
+@@ -323,7 +324,7 @@
+ 	| clipper-* | craynv-* | cydra-* \
+ 	| d10v-* | d30v-* | dlx-* \
+ 	| elxsi-* \
+-	| f30[01]-* | f700-* | fr30-* | frv-* | fx80-* \
++	| f30[01]-* | f700-* | fido-* | fr30-* | frv-* | fx80-* \
+ 	| h8300-* | h8500-* \
+ 	| hppa-* | hppa1.[01]-* | hppa2.0-* | hppa2.0[nw]-* | hppa64-* \
+ 	| i*86-* | i860-* | i960-* | ia64-* \
+@@ -924,6 +925,9 @@
+ 		basic_machine=sh-hitachi
+ 		os=-hms
+ 		;;
++	sh5el)
++		basic_machine=sh5le-unknown
++		;;
+ 	sh64)
+ 		basic_machine=sh64-unknown
+ 		;;
+@@ -1370,6 +1374,9 @@
+ # system, and we'll never get to this point.
+ 
+ case $basic_machine in
++        score-*)
++		os=-elf
++		;;
+         spu-*)
+ 		os=-elf
+ 		;;
+Index: configure
+--- ncurses-5.6-20061217+/configure	2006-12-17 16:33:38.000000000 +0000
++++ ncurses-5.6-20061223/configure	2006-12-24 00:49:05.000000000 +0000
+@@ -1,5 +1,5 @@
+ #! /bin/sh
+-# From configure.in Revision: 1.383 .
++# From configure.in Revision: 1.384 .
+ # Guess values for system-dependent variables and create Makefiles.
+ # Generated by Autoconf 2.52.20061216.
+ #
+@@ -5021,11 +5021,11 @@
+ 
+ 		MK_SHARED_LIB='${CC} ${CFLAGS} -shared -Wl,-soname,'$cf_shared_soname',-stats,-lc -o $@'
+ 		;;
+-	openbsd2*)
++	openbsd[2-9].*)
+ 		CC_SHARED_OPTS="$CC_SHARED_OPTS -DPIC"
+ 		MK_SHARED_LIB='${LD} -Bshareable -soname,`basename $@.${ABI_VERSION}` -o $@'
+ 		;;
+-	openbsd*|freebsd[23]*)
++	openbsd*|freebsd[12].*)
+ 		CC_SHARED_OPTS="$CC_SHARED_OPTS -DPIC"
+ 		MK_SHARED_LIB='${LD} -Bshareable -o $@'
+ 		test "$cf_cv_shlib_version" = auto && cf_cv_shlib_version=rel
+@@ -14982,15 +14982,17 @@
+ if test "$with_termlib" != no ; then
+ 	LIB_SUBSETS="termlib"
+ 	test "$with_ext_funcs" = yes && LIB_SUBSETS="${LIB_SUBSETS}+ext_tinfo"
++	test "$cf_with_progs"  = yes && LIB_SUBSETS="${LIB_SUBSETS}+programs"
+ 	LIB_SUBSETS="${LIB_SUBSETS} "
+ else
+ 	LIB_SUBSETS="termlib+"
+ 	test "$with_ext_funcs" = yes && LIB_SUBSETS="${LIB_SUBSETS}ext_tinfo+"
++	test "$cf_with_progs"  = yes && LIB_SUBSETS="${LIB_SUBSETS}programs+"
+ fi
+ LIB_SUBSETS="${LIB_SUBSETS}base"
+ test "$with_widec"     = yes && LIB_SUBSETS="${LIB_SUBSETS}+widechar"
+ test "$with_ext_funcs" = yes && LIB_SUBSETS="${LIB_SUBSETS}+ext_funcs"
+-echo "$as_me:14993: result: $LIB_SUBSETS" >&5
++echo "$as_me:14995: result: $LIB_SUBSETS" >&5
+ echo "${ECHO_T}$LIB_SUBSETS" >&6
+ 
+ ### Construct the list of include-directories to be generated
+@@ -15028,7 +15030,7 @@
+ fi
+ 
+ ### Build up pieces for makefile rules
+-echo "$as_me:15031: checking default library suffix" >&5
++echo "$as_me:15033: checking default library suffix" >&5
+ echo $ECHO_N "checking default library suffix... $ECHO_C" >&6
+ 
+ 	case $DFT_LWR_MODEL in
+@@ -15039,10 +15041,10 @@
+ 	shared)  DFT_ARG_SUFFIX=''   ;;
+ 	esac
+ 	test -n "$LIB_SUFFIX" && DFT_ARG_SUFFIX="${LIB_SUFFIX}${DFT_ARG_SUFFIX}"
+-echo "$as_me:15042: result: $DFT_ARG_SUFFIX" >&5
++echo "$as_me:15044: result: $DFT_ARG_SUFFIX" >&5
+ echo "${ECHO_T}$DFT_ARG_SUFFIX" >&6
+ 
+-echo "$as_me:15045: checking default library-dependency suffix" >&5
++echo "$as_me:15047: checking default library-dependency suffix" >&5
+ echo $ECHO_N "checking default library-dependency suffix... $ECHO_C" >&6
+ 
+ 	case $DFT_LWR_MODEL in
+@@ -15071,10 +15073,10 @@
+ 		;;
+ 	esac
+ fi
+-echo "$as_me:15074: result: $DFT_DEP_SUFFIX" >&5
++echo "$as_me:15076: result: $DFT_DEP_SUFFIX" >&5
+ echo "${ECHO_T}$DFT_DEP_SUFFIX" >&6
+ 
+-echo "$as_me:15077: checking default object directory" >&5
++echo "$as_me:15079: checking default object directory" >&5
+ echo $ECHO_N "checking default object directory... $ECHO_C" >&6
+ 
+ 	case $DFT_LWR_MODEL in
+@@ -15090,12 +15092,12 @@
+ 			DFT_OBJ_SUBDIR='obj_s' ;;
+ 		esac
+ 	esac
+-echo "$as_me:15093: result: $DFT_OBJ_SUBDIR" >&5
++echo "$as_me:15095: result: $DFT_OBJ_SUBDIR" >&5
+ echo "${ECHO_T}$DFT_OBJ_SUBDIR" >&6
+ 
+ # libtool thinks it can make c++ shared libraries (perhaps only g++)
+ if test "$cf_with_cxx" = yes ; then
+-echo "$as_me:15098: checking c++ library-dependency suffix" >&5
++echo "$as_me:15100: checking c++ library-dependency suffix" >&5
+ echo $ECHO_N "checking c++ library-dependency suffix... $ECHO_C" >&6
+ if test "$with_libtool" != "no"; then
+ 	CXX_LIB_SUFFIX=$DFT_DEP_SUFFIX
+@@ -15121,7 +15123,7 @@
+ 	esac
+ 	test -n "$LIB_SUFFIX" && CXX_LIB_SUFFIX="${LIB_SUFFIX}${CXX_LIB_SUFFIX}"
+ fi
+-echo "$as_me:15124: result: $CXX_LIB_SUFFIX" >&5
++echo "$as_me:15126: result: $CXX_LIB_SUFFIX" >&5
+ echo "${ECHO_T}$CXX_LIB_SUFFIX" >&6
+ 
+ fi
+@@ -15160,12 +15162,12 @@
+ # needed for Ada95
+ TINFO_ARGS2=`echo "$TINFO_ARGS" | sed -e 's,-L\.\./,-L../../,'`
+ 
+-echo "$as_me:15163: checking where we will install curses.h" >&5
++echo "$as_me:15165: checking where we will install curses.h" >&5
+ echo $ECHO_N "checking where we will install curses.h... $ECHO_C" >&6
+ test "$with_overwrite" = no && \
+ test "x$includedir" = 'x${prefix}/include' && \
+ 	includedir='${prefix}/include/ncurses'${LIB_SUFFIX}
+-echo "$as_me:15168: result: $includedir" >&5
++echo "$as_me:15170: result: $includedir" >&5
+ echo "${ECHO_T}$includedir" >&6
+ 
+ ### Resolve a conflict between normal and wide-curses by forcing applications
+@@ -15173,7 +15175,7 @@
+ if test "$with_overwrite" != no ; then
+ if test "$NCURSES_LIBUTF8" = 1 ; then
+ 	NCURSES_LIBUTF8='defined(HAVE_LIBUTF8_H)'
+-	{ echo "$as_me:15176: WARNING: Wide-character applications must define HAVE_LIBUTF8_H to include curses.h" >&5
++	{ echo "$as_me:15178: WARNING: Wide-character applications must define HAVE_LIBUTF8_H to include curses.h" >&5
+ echo "$as_me: WARNING: Wide-character applications must define HAVE_LIBUTF8_H to include curses.h" >&2;}
+ fi
+ fi
+@@ -15186,7 +15188,7 @@
+ ### Construct the list of subdirectories for which we'll customize makefiles
+ ### with the appropriate compile-rules.
+ 
+-echo "$as_me:15189: checking for src modules" >&5
++echo "$as_me:15191: checking for src modules" >&5
+ echo $ECHO_N "checking for src modules... $ECHO_C" >&6
+ 
+ # dependencies and linker-arguments for test-programs
+@@ -15249,7 +15251,7 @@
+ 		fi
+ 	fi
+ done
+-echo "$as_me:15252: result: $cf_cv_src_modules" >&5
++echo "$as_me:15254: result: $cf_cv_src_modules" >&5
+ echo "${ECHO_T}$cf_cv_src_modules" >&6
+ 
+ TEST_ARGS="-L${LIB_DIR} $TEST_ARGS"
+@@ -15495,7 +15497,7 @@
+ : ${CONFIG_STATUS=./config.status}
+ ac_clean_files_save=$ac_clean_files
+ ac_clean_files="$ac_clean_files $CONFIG_STATUS"
+-{ echo "$as_me:15498: creating $CONFIG_STATUS" >&5
++{ echo "$as_me:15500: creating $CONFIG_STATUS" >&5
+ echo "$as_me: creating $CONFIG_STATUS" >&6;}
+ cat >$CONFIG_STATUS <<_ACEOF
+ #! $SHELL
+@@ -15671,7 +15673,7 @@
+     echo "$ac_cs_version"; exit 0 ;;
+   --he | --h)
+     # Conflict between --help and --header
+-    { { echo "$as_me:15674: error: ambiguous option: $1
++    { { echo "$as_me:15676: error: ambiguous option: $1
+ Try \`$0 --help' for more information." >&5
+ echo "$as_me: error: ambiguous option: $1
+ Try \`$0 --help' for more information." >&2;}
+@@ -15690,7 +15692,7 @@
+     ac_need_defaults=false;;
+ 
+   # This is an error.
+-  -*) { { echo "$as_me:15693: error: unrecognized option: $1
++  -*) { { echo "$as_me:15695: error: unrecognized option: $1
+ Try \`$0 --help' for more information." >&5
+ echo "$as_me: error: unrecognized option: $1
+ Try \`$0 --help' for more information." >&2;}
+@@ -15780,7 +15782,7 @@
+   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+   "default" ) CONFIG_COMMANDS="$CONFIG_COMMANDS default" ;;
+   "include/ncurses_cfg.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/ncurses_cfg.h:include/ncurses_cfg.hin" ;;
+-  *) { { echo "$as_me:15783: error: invalid argument: $ac_config_target" >&5
++  *) { { echo "$as_me:15785: error: invalid argument: $ac_config_target" >&5
+ echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
+    { (exit 1); exit 1; }; };;
+   esac
+@@ -16146,7 +16148,7 @@
+   esac
+ 
+   if test x"$ac_file" != x-; then
+-    { echo "$as_me:16149: creating $ac_file" >&5
++    { echo "$as_me:16151: creating $ac_file" >&5
+ echo "$as_me: creating $ac_file" >&6;}
+     rm -f "$ac_file"
+   fi
+@@ -16164,7 +16166,7 @@
+       -) echo $tmp/stdin ;;
+       [\\/$]*)
+          # Absolute (can't be DOS-style, as IFS=:)
+-         test -f "$f" || { { echo "$as_me:16167: error: cannot find input file: $f" >&5
++         test -f "$f" || { { echo "$as_me:16169: error: cannot find input file: $f" >&5
+ echo "$as_me: error: cannot find input file: $f" >&2;}
+    { (exit 1); exit 1; }; }
+          echo $f;;
+@@ -16177,7 +16179,7 @@
+            echo $srcdir/$f
+          else
+            # /dev/null tree
+-           { { echo "$as_me:16180: error: cannot find input file: $f" >&5
++           { { echo "$as_me:16182: error: cannot find input file: $f" >&5
+ echo "$as_me: error: cannot find input file: $f" >&2;}
+    { (exit 1); exit 1; }; }
+          fi;;
+@@ -16243,7 +16245,7 @@
+   * )   ac_file_in=$ac_file.in ;;
+   esac
+ 
+-  test x"$ac_file" != x- && { echo "$as_me:16246: creating $ac_file" >&5
++  test x"$ac_file" != x- && { echo "$as_me:16248: creating $ac_file" >&5
+ echo "$as_me: creating $ac_file" >&6;}
+ 
+   # First look for the input files in the build tree, otherwise in the
+@@ -16254,7 +16256,7 @@
+       -) echo $tmp/stdin ;;
+       [\\/$]*)
+          # Absolute (can't be DOS-style, as IFS=:)
+-         test -f "$f" || { { echo "$as_me:16257: error: cannot find input file: $f" >&5
++         test -f "$f" || { { echo "$as_me:16259: error: cannot find input file: $f" >&5
+ echo "$as_me: error: cannot find input file: $f" >&2;}
+    { (exit 1); exit 1; }; }
+          echo $f;;
+@@ -16267,7 +16269,7 @@
+            echo $srcdir/$f
+          else
+            # /dev/null tree
+-           { { echo "$as_me:16270: error: cannot find input file: $f" >&5
++           { { echo "$as_me:16272: error: cannot find input file: $f" >&5
+ echo "$as_me: error: cannot find input file: $f" >&2;}
+    { (exit 1); exit 1; }; }
+          fi;;
+@@ -16325,7 +16327,7 @@
+   rm -f $tmp/in
+   if test x"$ac_file" != x-; then
+     if cmp -s $ac_file $tmp/config.h 2>/dev/null; then
+-      { echo "$as_me:16328: $ac_file is unchanged" >&5
++      { echo "$as_me:16330: $ac_file is unchanged" >&5
+ echo "$as_me: $ac_file is unchanged" >&6;}
+     else
+       ac_dir=`$as_expr X"$ac_file" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+@@ -16681,8 +16683,8 @@
+ 
+ cat >> Makefile <<CF_EOF
+ 
+-install.data \\
+-uninstall.data ::
++install.libs uninstall.libs \\
++install.data uninstall.data ::
+ $MAKE_TERMINFO	cd misc && \${MAKE} \${CF_MFLAGS} \$@
+ 
+ install.man \\
+Index: configure.in
+Prereq:  1.383 
+--- ncurses-5.6-20061217+/configure.in	2006-12-17 01:26:06.000000000 +0000
++++ ncurses-5.6-20061223/configure.in	2006-12-23 23:33:52.000000000 +0000
+@@ -28,14 +28,14 @@
+ dnl
+ dnl Author: Thomas E. Dickey 1995-on
+ dnl
+-dnl $Id: configure.in,v 1.383 2006/12/17 01:26:06 tom Exp $
++dnl $Id: configure.in,v 1.384 2006/12/23 23:33:52 tom Exp $
+ dnl Process this file with autoconf to produce a configure script.
+ dnl
+ dnl See http://invisible-island.net/autoconf/ for additional information.
+ dnl
+ dnl ---------------------------------------------------------------------------
+ AC_PREREQ(2.13.20020210)
+-AC_REVISION($Revision: 1.383 $)
++AC_REVISION($Revision: 1.384 $)
+ AC_INIT(ncurses/base/lib_initscr.c)
+ AC_CONFIG_HEADER(include/ncurses_cfg.h:include/ncurses_cfg.hin)
+ 
+@@ -1377,10 +1377,12 @@
+ if test "$with_termlib" != no ; then
+ 	LIB_SUBSETS="termlib"
+ 	test "$with_ext_funcs" = yes && LIB_SUBSETS="${LIB_SUBSETS}+ext_tinfo"
++	test "$cf_with_progs"  = yes && LIB_SUBSETS="${LIB_SUBSETS}+programs"
+ 	LIB_SUBSETS="${LIB_SUBSETS} "
+ else
+ 	LIB_SUBSETS="termlib+"
+ 	test "$with_ext_funcs" = yes && LIB_SUBSETS="${LIB_SUBSETS}ext_tinfo+"
++	test "$cf_with_progs"  = yes && LIB_SUBSETS="${LIB_SUBSETS}programs+"
+ fi
+ LIB_SUBSETS="${LIB_SUBSETS}base"
+ test "$with_widec"     = yes && LIB_SUBSETS="${LIB_SUBSETS}+widechar"
+Index: dist.mk
+Prereq:  1.567 
+--- ncurses-5.6-20061217+/dist.mk	2006-12-17 19:58:35.000000000 +0000
++++ ncurses-5.6-20061223/dist.mk	2006-12-23 18:06:51.000000000 +0000
+@@ -25,7 +25,7 @@
+ # use or other dealings in this Software without prior written               #
+ # authorization.                                                             #
+ ##############################################################################
+-# $Id: dist.mk,v 1.567 2006/12/17 19:58:35 tom Exp $
++# $Id: dist.mk,v 1.568 2006/12/23 18:06:51 tom Exp $
+ # Makefile for creating ncurses distributions.
+ #
+ # This only needs to be used directly as a makefile by developers, but
+@@ -37,7 +37,7 @@
+ # These define the major/minor/patch versions of ncurses.
+ NCURSES_MAJOR = 5
+ NCURSES_MINOR = 6
+-NCURSES_PATCH = 20061217
++NCURSES_PATCH = 20061223
+ 
+ # We don't append the patch to the version, since this only applies to releases
+ VERSION = $(NCURSES_MAJOR).$(NCURSES_MINOR)
+Index: form/modules
+Prereq:  1.14 
+--- ncurses-5.6-20061217+/form/modules	2004-12-25 23:29:22.000000000 +0000
++++ ncurses-5.6-20061223/form/modules	2006-12-24 00:52:58.000000000 +0000
+@@ -1,6 +1,6 @@
+-# $Id: modules,v 1.14 2004/12/25 23:29:22 tom Exp $
++# $Id: modules,v 1.15 2006/12/24 00:52:58 tom Exp $
+ ##############################################################################
+-# Copyright (c) 1998,2004 Free Software Foundation, Inc.                     #
++# Copyright (c) 1998-2004,2006 Free Software Foundation, Inc.                #
+ #                                                                            #
+ # Permission is hereby granted, free of charge, to any person obtaining a    #
+ # copy of this software and associated documentation files (the "Software"), #
+@@ -27,7 +27,7 @@
+ # authorization.                                                             #
+ ##############################################################################
+ #
+-# Author: Thomas E. Dickey
++# Author: Thomas E. Dickey	1995-on
+ #
+ 
+ @ base
+@@ -72,3 +72,5 @@
+ fty_ipv4	lib		$(srcdir)	$(FORM_PRIV_H)
+ fty_num		lib		$(srcdir)	$(FORM_PRIV_H)
+ fty_regex	lib		$(srcdir)	$(FORM_PRIV_H)
++
++# vile:makemode
+Index: menu/modules
+Prereq:  1.16 
+--- ncurses-5.6-20061217+/menu/modules	2004-12-25 22:06:33.000000000 +0000
++++ ncurses-5.6-20061223/menu/modules	2006-12-24 00:52:39.000000000 +0000
+@@ -1,6 +1,6 @@
+-# $Id: modules,v 1.16 2004/12/25 22:06:33 tom Exp $
++# $Id: modules,v 1.17 2006/12/24 00:52:39 tom Exp $
+ ##############################################################################
+-# Copyright (c) 1998,2004 Free Software Foundation, Inc.                     #
++# Copyright (c) 1998-2004,2006 Free Software Foundation, Inc.                #
+ #                                                                            #
+ # Permission is hereby granted, free of charge, to any person obtaining a    #
+ # copy of this software and associated documentation files (the "Software"), #
+@@ -27,7 +27,7 @@
+ # authorization.                                                             #
+ ##############################################################################
+ #
+-# Author: Thomas E. Dickey <dickey@clark.net> 1996,1997
++# Author: Thomas E. Dickey	1996-on
+ #
+ 
+ @ base
+@@ -59,3 +59,5 @@
+ m_trace		lib		$(srcdir)	$(MENU_PRIV_H)
+ m_userptr	lib		$(srcdir)	$(MENU_PRIV_H)
+ m_win		lib		$(srcdir)	$(MENU_PRIV_H)
++
++# vile:makemode
+Index: misc/Makefile.in
+Prereq:  1.40 
+--- ncurses-5.6-20061217+/misc/Makefile.in	2006-10-21 13:28:03.000000000 +0000
++++ ncurses-5.6-20061223/misc/Makefile.in	2006-12-23 22:16:53.000000000 +0000
+@@ -1,4 +1,4 @@
+-# $Id: Makefile.in,v 1.40 2006/10/21 13:28:03 tom Exp $
++# $Id: Makefile.in,v 1.41 2006/12/23 22:16:53 tom Exp $
+ ##############################################################################
+ # Copyright (c) 1998-2004,2006 Free Software Foundation, Inc.                #
+ #                                                                            #
+@@ -76,7 +76,7 @@
+ 
+ sources :
+ 
+-install : install.data install.scripts
++install : install.data install.libs
+ 
+ install.data :	terminfo.tmp \
+ 		$(DESTDIR)$(libdir) \
+@@ -103,7 +103,7 @@
+ 
+ NCURSES_CONFIG	= ncurses@DFT_ARG_SUFFIX@@cf_cv_abi_version@-config
+ 
+-install.scripts :	ncurses-config
++install.libs : ncurses-config
+ 	$(INSTALL_PROG) ncurses-config $(DESTDIR)$(bindir)/$(NCURSES_CONFIG)
+ 
+ terminfo.tmp : run_tic.sed $(source)
+@@ -120,14 +120,14 @@
+ $(DESTDIR)$(tabsetdir) :
+ 	$(SHELL) $(top_srcdir)/mkinstalldirs $@
+ 
+-uninstall : uninstall.data uninstall.scripts
++uninstall : uninstall.data uninstall.libs
+ 
+ uninstall.data :
+ 	-test -d $(DESTDIR)$(tabsetdir) && rm -rf $(DESTDIR)$(tabsetdir)
+ 	-test -d $(DESTDIR)$(ticdir) && rm -rf $(DESTDIR)$(ticdir)
+ 	-test -f $(DESTDIR)$(ticfile) && rm -f $(DESTDIR)$(ticfile)
+ 
+-uninstall.scripts :
++uninstall.libs :
+ 	-rm -f $(DESTDIR)$(bindir)/$(NCURSES_CONFIG)
+ 
+ tags :
+Index: mk-1st.awk
+Prereq:  1.68 
+--- ncurses-5.6-20061217+/mk-1st.awk	2006-10-08 00:14:08.000000000 +0000
++++ ncurses-5.6-20061223/mk-1st.awk	2006-12-24 00:12:23.000000000 +0000
+@@ -1,4 +1,4 @@
+-# $Id: mk-1st.awk,v 1.68 2006/10/08 00:14:08 tom Exp $
++# $Id: mk-1st.awk,v 1.69 2006/12/24 00:12:23 tom Exp $
+ ##############################################################################
+ # Copyright (c) 1998-2005,2006 Free Software Foundation, Inc.                #
+ #                                                                            #
+@@ -37,7 +37,7 @@
+ #	model		  (directory into which we compile, e.g., "obj")
+ #	prefix		  (e.g., "lib", for Unix-style libraries)
+ #	suffix		  (e.g., "_g.a", for debug libraries)
+-#	subset		  ("none", "base", "base+ext_funcs" or "termlib")
++#	subset		  ("none", "base", "base+ext_funcs" or "termlib", etc.)
+ #	ShlibVer	  ("rel", "abi" or "auto", to augment DoLinks variable)
+ #	ShlibVerInfix ("yes" or "no", determines location of version #)
+ #	DoLinks		  ("yes", "reverse" or "no", flag to add symbolic links)
+@@ -52,6 +52,9 @@
+ #	Mixed-case variable names are ok.
+ #	HP/UX requires shared libraries to have executable permissions.
+ #
++function is_termlib() {
++		return ( subset ~ /^termlib(\+(ext_tinfo|programs))*$/ );
++	}
+ function symlink(src,dst) {
+ 		if ( src != dst ) {
+ 			printf "rm -f %s; ", dst
+@@ -64,19 +67,19 @@
+ function removelinks(directory) {
+ 		rmlink(directory, end_name);
+ 		if ( DoLinks == "reverse" ) {
+-				if ( ShlibVer == "rel" ) {
+-					rmlink(directory, abi_name);
+-					rmlink(directory, rel_name);
+-				} else if ( ShlibVer == "abi" ) {
+-					rmlink(directory, abi_name);
+-				}
++			if ( ShlibVer == "rel" ) {
++				rmlink(directory, abi_name);
++				rmlink(directory, rel_name);
++			} else if ( ShlibVer == "abi" ) {
++				rmlink(directory, abi_name);
++			}
+ 		} else {
+-				if ( ShlibVer == "rel" ) {
+-					rmlink(directory, abi_name);
+-					rmlink(directory, lib_name);
+-				} else if ( ShlibVer == "abi" ) {
+-					rmlink(directory, lib_name);
+-				}
++			if ( ShlibVer == "rel" ) {
++				rmlink(directory, abi_name);
++				rmlink(directory, lib_name);
++			} else if ( ShlibVer == "abi" ) {
++				rmlink(directory, lib_name);
++			}
+ 		}
+ 	}
+ function make_shlib(objs, shlib_list) {
+@@ -105,17 +108,17 @@
+ 	}
+ function shlib_rule(directory) {
+ 		if ( ShlibVer == "cygdll" ) {
+-				dst_libs = sprintf("%s/$(SHARED_LIB) %s/$(IMPORT_LIB)", directory, directory);
++			dst_libs = sprintf("%s/$(SHARED_LIB) %s/$(IMPORT_LIB)", directory, directory);
+ 		} else {
+-				dst_libs = sprintf("%s/%s", directory, end_name);
++			dst_libs = sprintf("%s/%s", directory, end_name);
+ 		}
+ 		printf "%s : %s $(%s_OBJS)\n", dst_libs, directory, OBJS
+ 		printf "\t@echo linking $@\n"
+ 		print "\t-@rm -f %s", dst_libs;
+-		if ( subset == "termlib" || subset == "termlib+ext_tinfo" ) {
+-				make_shlib(OBJS, "TINFO_LIST")
++		if ( is_termlib() ) {
++			make_shlib(OBJS, "TINFO_LIST")
+ 		} else {
+-				make_shlib(OBJS, "SHLIB_LIST")
++			make_shlib(OBJS, "SHLIB_LIST")
+ 		}
+ 		sharedlinks(directory)
+ 	}
+@@ -163,7 +166,7 @@
+ 				}
+ 				using = 1
+ 			}
+-			if ( subset == "termlib" || subset == "termlib+ext_tinfo" ) {
++			if ( is_termlib() ) {
+ 				OBJS  = MODEL "_T"
+ 			} else {
+ 				OBJS  = MODEL
+@@ -393,3 +396,4 @@
+ 			}
+ 		}
+ 	}
++# vile:ts=4 sw=4
+Index: ncurses/modules
+Prereq:  1.107 
+--- ncurses-5.6-20061217+/ncurses/modules	2006-08-12 14:19:44.000000000 +0000
++++ ncurses-5.6-20061223/ncurses/modules	2006-12-24 00:38:10.000000000 +0000
+@@ -1,4 +1,4 @@
+-# $Id: modules,v 1.107 2006/08/12 14:19:44 tom Exp $
++# $Id: modules,v 1.108 2006/12/24 00:38:10 tom Exp $
+ ##############################################################################
+ # Copyright (c) 1998-2005,2006 Free Software Foundation, Inc.                #
+ #                                                                            #
+@@ -157,18 +157,12 @@
+ @ termlib
+ access		lib		$(tinfo)
+ add_tries	lib		$(tinfo)
+-alloc_entry	lib		$(tinfo)	../include/term.h $(INCDIR)/term_entry.h $(INCDIR)/tic.h
+ alloc_ttype	lib		$(tinfo)	../include/term.h $(INCDIR)/term_entry.h $(INCDIR)/tic.h
+-captoinfo	lib		$(tinfo)	$(INCDIR)/tic.h
+ codes		lib		.
+-comp_captab	lib		.		$(INCDIR)/tic.h ../include/term.h ../include/hashsize.h
+ comp_error	lib		$(tinfo)	$(INCDIR)/tic.h
+-comp_expand	lib		$(tinfo)	$(INCDIR)/tic.h
+-comp_hash	lib		$(tinfo)	../include/term.h $(INCDIR)/tic.h ../include/hashsize.h
+-comp_parse	lib		$(tinfo)	../include/term.h $(INCDIR)/term_entry.h $(INCDIR)/tic.h
+-comp_scan	lib		$(tinfo)	$(INCDIR)/tic.h
+ db_iterator	lib		$(tinfo)	$(INCDIR)/tic.h
+ doalloc		lib		$(tinfo)
++entries		lib		$(tinfo)	../include/term.h $(INCDIR)/tic.h
+ fallback	lib		.		../include/term.h $(INCDIR)/tic.h
+ free_ttype	lib		$(tinfo)	../include/term.h $(INCDIR)/term_entry.h $(INCDIR)/tic.h
+ getenv_num	lib		$(tinfo)
+@@ -200,7 +194,6 @@
+ lib_twait	lib		$(serial)
+ name_match	lib		$(tinfo)	../include/term.h $(INCDIR)/tic.h
+ names		lib		.
+-parse_entry	lib		$(tinfo)	../include/term.h $(INCDIR)/term_entry.h $(INCDIR)/tic.h ../include/parametrized.h $(INCDIR)/capdefaults.c
+ read_entry	lib		$(tinfo)	../include/term.h $(INCDIR)/term_entry.h $(INCDIR)/tic.h
+ read_termcap	lib		$(tinfo)	../include/term.h $(INCDIR)/term_entry.h $(INCDIR)/tic.h
+ setbuf		lib		$(tinfo)
+@@ -211,6 +204,17 @@
+ trim_sgr0	lib		$(tinfo)	../include/term.h $(INCDIR)/term_entry.h $(INCDIR)/tic.h
+ unctrl		lib		.
+ visbuf		lib		$(trace)	$(INCDIR)/tic.h
++
++# Modules used only for tic, other programs using internal interfaces
++@ programs
++alloc_entry	lib		$(tinfo)	../include/term.h $(INCDIR)/term_entry.h $(INCDIR)/tic.h
++captoinfo	lib		$(tinfo)	$(INCDIR)/tic.h
++comp_captab	lib		.		$(INCDIR)/tic.h ../include/term.h ../include/hashsize.h
++comp_expand	lib		$(tinfo)	$(INCDIR)/tic.h
++comp_hash	lib		$(tinfo)	../include/term.h $(INCDIR)/tic.h ../include/hashsize.h
++comp_parse	lib		$(tinfo)	../include/term.h $(INCDIR)/term_entry.h $(INCDIR)/tic.h
++comp_scan	lib		$(tinfo)	$(INCDIR)/tic.h
++parse_entry	lib		$(tinfo)	../include/term.h $(INCDIR)/term_entry.h $(INCDIR)/tic.h ../include/parametrized.h $(INCDIR)/capdefaults.c
+ write_entry	lib		$(tinfo)	../include/term.h $(INCDIR)/term_entry.h $(INCDIR)/tic.h
+ 
+ # Extensions to the termlib library
+@@ -221,3 +225,5 @@
+ keybound	lib		$(base)
+ keyok		lib		$(base)
+ version		lib		$(base)
++
++# vile:makemode
+Index: ncurses/tinfo/comp_parse.c
+Prereq:  1.63 
+--- ncurses-5.6-20061217+/ncurses/tinfo/comp_parse.c	2006-07-08 18:55:14.000000000 +0000
++++ ncurses-5.6-20061223/ncurses/tinfo/comp_parse.c	2006-12-24 00:45:20.000000000 +0000
+@@ -53,7 +53,7 @@
+ #include <tic.h>
+ #include <term_entry.h>
+ 
+-MODULE_ID("$Id: comp_parse.c,v 1.63 2006/07/08 18:55:14 tom Exp $")
++MODULE_ID("$Id: comp_parse.c,v 1.64 2006/12/24 00:45:20 tom Exp $")
+ 
+ static void sanity_check2(TERMTYPE *, bool);
+ NCURSES_IMPEXP void NCURSES_API(*_nc_check_termtype2) (TERMTYPE *, bool) = sanity_check2;
+@@ -62,30 +62,6 @@
+ static void sanity_check(TERMTYPE *);
+ NCURSES_IMPEXP void NCURSES_API(*_nc_check_termtype) (TERMTYPE *) = sanity_check;
+ 
+-/****************************************************************************
+- *
+- * Entry queue handling
+- *
+- ****************************************************************************/
+-/*
+- *  The entry list is a doubly linked list with NULLs terminating the lists:
+- *
+- *	  ---------   ---------   ---------
+- *	  |       |   |       |   |       |   offset
+- *        |-------|   |-------|   |-------|
+- *	  |   ----+-->|   ----+-->|  NULL |   next
+- *	  |-------|   |-------|   |-------|
+- *	  |  NULL |<--+----   |<--+----   |   last
+- *	  ---------   ---------   ---------
+- *	      ^                       ^
+- *	      |                       |
+- *	      |                       |
+- *	   _nc_head                _nc_tail
+- */
+-
+-NCURSES_EXPORT_VAR(ENTRY *) _nc_head = 0;
+-NCURSES_EXPORT_VAR(ENTRY *) _nc_tail = 0;
+-
+ static void
+ enqueue(ENTRY * ep)
+ /* add an entry to the in-core list */
+@@ -103,51 +79,6 @@
+ 	newp->last->next = newp;
+ }
+ 
+-NCURSES_EXPORT(void)
+-_nc_free_entries(ENTRY * headp)
+-/* free the allocated storage consumed by list entries */
+-{
+-    (void) headp;		/* unused - _nc_head is altered here! */
+-
+-    while (_nc_head != 0) {
+-	_nc_free_termtype(&(_nc_head->tterm));
+-    }
+-}
+-
+-NCURSES_EXPORT(ENTRY *)
+-_nc_delink_entry(ENTRY * headp, TERMTYPE *tterm)
+-/* delink the allocated storage for the given list entry */
+-{
+-    ENTRY *ep, *last;
+-
+-    for (last = 0, ep = headp; ep != 0; last = ep, ep = ep->next) {
+-	if (&(ep->tterm) == tterm) {
+-	    if (last != 0) {
+-		last->next = ep->next;
+-	    }
+-	    if (ep == _nc_head) {
+-		_nc_head = ep->next;
+-	    }
+-	    if (ep == _nc_tail) {
+-		_nc_tail = last;
+-	    }
+-	    break;
+-	}
+-    }
+-    return ep;
+-}
+-
+-NCURSES_EXPORT(void)
+-_nc_free_entry(ENTRY * headp, TERMTYPE *tterm)
+-/* free the allocated storage consumed by the given list entry */
+-{
+-    ENTRY *ep;
+-
+-    if ((ep = _nc_delink_entry(headp, tterm)) != 0) {
+-	free(ep);
+-    }
+-}
+-
+ static char *
+ force_bar(char *dst, char *src)
+ {
+Index: ncurses/tinfo/entries.c
+--- /dev/null	2006-12-24 02:05:08.472518000 +0000
++++ ncurses-5.6-20061223/ncurses/tinfo/entries.c	2006-12-24 00:58:33.000000000 +0000
+@@ -0,0 +1,109 @@
++/****************************************************************************
++ * Copyright (c) 2006 Free Software Foundation, Inc.                        *
++ *                                                                          *
++ * Permission is hereby granted, free of charge, to any person obtaining a  *
++ * copy of this software and associated documentation files (the            *
++ * "Software"), to deal in the Software without restriction, including      *
++ * without limitation the rights to use, copy, modify, merge, publish,      *
++ * distribute, distribute with modifications, sublicense, and/or sell       *
++ * copies of the Software, and to permit persons to whom the Software is    *
++ * furnished to do so, subject to the following conditions:                 *
++ *                                                                          *
++ * The above copyright notice and this permission notice shall be included  *
++ * in all copies or substantial portions of the Software.                   *
++ *                                                                          *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  *
++ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF               *
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.   *
++ * IN NO EVENT SHALL THE ABOVE COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,   *
++ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR    *
++ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR    *
++ * THE USE OR OTHER DEALINGS IN THE SOFTWARE.                               *
++ *                                                                          *
++ * Except as contained in this notice, the name(s) of the above copyright   *
++ * holders shall not be used in advertising or otherwise to promote the     *
++ * sale, use or other dealings in this Software without prior written       *
++ * authorization.                                                           *
++ ****************************************************************************/
++
++/****************************************************************************
++ *  Author: Thomas E. Dickey                                                *
++ ****************************************************************************/
++
++#include <curses.priv.h>
++
++#include <ctype.h>
++
++#include <tic.h>
++#include <term_entry.h>
++
++MODULE_ID("$Id: entries.c,v 1.2 2006/12/24 00:58:33 tom Exp $")
++
++/****************************************************************************
++ *
++ * Entry queue handling
++ *
++ ****************************************************************************/
++/*
++ *  The entry list is a doubly linked list with NULLs terminating the lists:
++ *
++ *	  ---------   ---------   ---------
++ *	  |       |   |       |   |       |   offset
++ *        |-------|   |-------|   |-------|
++ *	  |   ----+-->|   ----+-->|  NULL |   next
++ *	  |-------|   |-------|   |-------|
++ *	  |  NULL |<--+----   |<--+----   |   last
++ *	  ---------   ---------   ---------
++ *	      ^                       ^
++ *	      |                       |
++ *	      |                       |
++ *	   _nc_head                _nc_tail
++ */
++
++NCURSES_EXPORT_VAR(ENTRY *) _nc_head = 0;
++NCURSES_EXPORT_VAR(ENTRY *) _nc_tail = 0;
++
++NCURSES_EXPORT(void)
++_nc_free_entry(ENTRY * headp, TERMTYPE *tterm)
++/* free the allocated storage consumed by the given list entry */
++{
++    ENTRY *ep;
++
++    if ((ep = _nc_delink_entry(headp, tterm)) != 0) {
++	free(ep);
++    }
++}
++
++NCURSES_EXPORT(void)
++_nc_free_entries(ENTRY * headp)
++/* free the allocated storage consumed by list entries */
++{
++    (void) headp;		/* unused - _nc_head is altered here! */
++
++    while (_nc_head != 0) {
++	_nc_free_termtype(&(_nc_head->tterm));
++    }
++}
++
++NCURSES_EXPORT(ENTRY *)
++_nc_delink_entry(ENTRY * headp, TERMTYPE *tterm)
++/* delink the allocated storage for the given list entry */
++{
++    ENTRY *ep, *last;
++
++    for (last = 0, ep = headp; ep != 0; last = ep, ep = ep->next) {
++	if (&(ep->tterm) == tterm) {
++	    if (last != 0) {
++		last->next = ep->next;
++	    }
++	    if (ep == _nc_head) {
++		_nc_head = ep->next;
++	    }
++	    if (ep == _nc_tail) {
++		_nc_tail = last;
++	    }
++	    break;
++	}
++    }
++    return ep;
++}
+Index: panel/modules
+--- ncurses-5.6-20061217+/panel/modules	1998-02-11 12:14:02.000000000 +0000
++++ ncurses-5.6-20061223/panel/modules	2006-12-24 00:53:17.000000000 +0000
+@@ -1,5 +1,6 @@
++# $Id: modules,v 1.9 2006/12/24 00:53:17 tom Exp $
+ ##############################################################################
+-# Copyright (c) 1998 Free Software Foundation, Inc.                          #
++# Copyright (c) 1998,2006 Free Software Foundation, Inc.                     #
+ #                                                                            #
+ # Permission is hereby granted, free of charge, to any person obtaining a    #
+ # copy of this software and associated documentation files (the "Software"), #
+@@ -26,7 +27,7 @@
+ # authorization.                                                             #
+ ##############################################################################
+ #
+-# Author: Thomas E. Dickey <dickey@clark.net> 1995,1997
++# Author: Thomas E. Dickey	1995-on
+ #
+ 
+ @ base
+@@ -47,3 +48,4 @@
+ p_user		lib		$(srcdir)	$(PANEL_PRIV_H)
+ p_win		lib		$(srcdir)	$(PANEL_PRIV_H)
+ 
++# vile:makemode
+Index: progs/modules
+Prereq:  1.12 
+--- ncurses-5.6-20061217+/progs/modules	2005-09-25 00:54:22.000000000 +0000
++++ ncurses-5.6-20061223/progs/modules	2006-12-24 00:53:21.000000000 +0000
+@@ -1,7 +1,7 @@
+-# $Id: modules,v 1.12 2005/09/25 00:54:22 tom Exp $
++# $Id: modules,v 1.13 2006/12/24 00:53:21 tom Exp $
+ # Program modules (some are in ncurses lib!)
+ ##############################################################################
+-# Copyright (c) 1998-2000,2005 Free Software Foundation, Inc.                #
++# Copyright (c) 1998-2005,2006 Free Software Foundation, Inc.                #
+ #                                                                            #
+ # Permission is hereby granted, free of charge, to any person obtaining a    #
+ # copy of this software and associated documentation files (the "Software"), #
+@@ -28,7 +28,7 @@
+ # authorization.                                                             #
+ ##############################################################################
+ #
+-# Author: Thomas E. Dickey <dickey@clark.net> 1995,1997
++# Author: Thomas E. Dickey	1995-on
+ #
+ 
+ @ base
+@@ -39,3 +39,5 @@
+ infocmp		progs		$(srcdir)	$(HEADER_DEPS)             $(srcdir)/dump_entry.h
+ tput		progs		$(srcdir)	$(HEADER_DEPS) transform.h termsort.c
+ tset		progs		$(srcdir)	$(HEADER_DEPS) transform.h $(srcdir)/dump_entry.h ../include/termcap.h
++
++# vile:makemode
+Index: tack/modules
+Prereq:  1.5 
+--- ncurses-5.6-20061217+/tack/modules	2006-04-22 22:37:18.000000000 +0000
++++ ncurses-5.6-20061223/tack/modules	2006-12-24 00:53:44.000000000 +0000
+@@ -1,3 +1,4 @@
++# $Id: modules,v 1.6 2006/12/24 00:53:44 tom Exp $
+ ##############################################################################
+ # Copyright (c) 1998-1999,2006 Free Software Foundation, Inc.                #
+ #                                                                            #
+@@ -25,7 +26,9 @@
+ # use or other dealings in this Software without prior written               #
+ # authorization.                                                             #
+ ##############################################################################
+-# $Id: modules,v 1.5 2006/04/22 22:37:18 tom Exp $
++#
++# Author: Thomas E. Dickey	1997-on
++#
+ @ base
+ ansi      progs   $(srcdir) $(srcdir)/tack.h ../include/term.h
+ charset   progs   $(srcdir) $(srcdir)/tack.h ../include/term.h
+@@ -43,3 +46,5 @@
+ sync      progs   $(srcdir) $(srcdir)/tack.h ../include/term.h
+ sysdep    progs   $(srcdir) $(srcdir)/tack.h ../include/term.h
+ tack      progs   $(srcdir) $(srcdir)/tack.h ../include/term.h
++
++# vile:makemode
+Index: test/modules
+Prereq:  1.28 
+--- ncurses-5.6-20061217+/test/modules	2006-11-04 18:56:08.000000000 +0000
++++ ncurses-5.6-20061223/test/modules	2006-12-24 00:53:52.000000000 +0000
+@@ -1,5 +1,4 @@
+-# Test-Program modules
+-# $Id: modules,v 1.28 2006/11/04 18:56:08 tom Exp $
++# $Id: modules,v 1.29 2006/12/24 00:53:52 tom Exp $
+ ##############################################################################
+ # Copyright (c) 1998-2005,2006 Free Software Foundation, Inc.                #
+ #                                                                            #
+@@ -28,8 +27,9 @@
+ # authorization.                                                             #
+ ##############################################################################
+ #
+-# Author: Thomas E. Dickey 1997-on
++# Author: Thomas E. Dickey	1997-on
+ #
++# Test-Program modules
+ 
+ @ base
+ background	progs		$(srcdir)	$(HEADER_DEPS)
+@@ -75,3 +75,5 @@
+ view		progs		$(srcdir)	$(HEADER_DEPS)
+ worm		progs		$(srcdir)	$(HEADER_DEPS)
+ xmas		progs		$(srcdir)	$(HEADER_DEPS)
++
++# vile:makemode

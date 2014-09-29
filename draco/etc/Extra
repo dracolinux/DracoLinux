@@ -1,0 +1,32 @@
+cat $DRACOSRC_PKG_SRC_DIR/rc.6.new > $DRACOSRC_PKG/etc/rc.d/rc.6.new || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/rc.S.new > $DRACOSRC_PKG/etc/rc.d/rc.S.new || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/rc.inet2 > $DRACOSRC_PKG/etc/rc.d/rc.inet2.new || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/rc.M.new > $DRACOSRC_PKG/etc/rc.d/rc.M.new || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/rc.modules > $DRACOSRC_PKG/etc/rc.d/rc.modules.new || exit 1
+chmod 755 $DRACOSRC_PKG/etc/rc.d/rc.* || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/mk.conf.new > $DRACOSRC_PKG/etc/mk.conf.new || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/rc.subr.new > $DRACOSRC_PKG/etc/rc.subr.new || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/rc.conf.new > $DRACOSRC_PKG/etc/rc.conf.new || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/profile.new > $DRACOSRC_PKG/etc/profile.new || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/ld.so.conf.new > $DRACOSRC_PKG/etc/ld.so.conf.new || exit 1
+chmod 444 $DRACOSRC_PKG/etc/{mk.conf.new,rc.subr.new,rc.conf.new,profile.new,ld.so.conf.new} || exit 1
+chmod 444 $DRACOSRC_PKG/etc/{profile.new,ld.so.conf.new} || exit 1
+
+cat $DRACOSRC_PKG_SRC_DIR/suauth > $DRACOSRC_PKG/etc/suauth.new || exit 1
+
+mkdir -p $DRACOSRC_PKG/sbin
+cat $DRACOSRC_PKG_SRC_DIR/scripts/netconfig > $DRACOSRC_PKG/sbin/netconfig || exit 1
+#cat $DRACOSRC_PKG_SRC_DIR/scripts/rescan-scsi-bus > $DRACOSRC_PKG/sbin/rescan-scsi-bus || exit 1
+chmod 755 $DRACOSRC_PKG/sbin/netconfig || exit 1
+
+mkdir -p $DRACOSRC_PKG/var/log/setup
+cat $DRACOSRC_PKG_SRC_DIR/setup/setup.draco > $DRACOSRC_PKG/var/log/setup/setup.draco || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/setup/setup.netconfig > $DRACOSRC_PKG/var/log/setup/setup.netconfig || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/setup/setup.services > $DRACOSRC_PKG/var/log/setup/setup.services || exit 1
+chmod 755 $DRACOSRC_PKG/var/log/setup/*
+
+echo "DracoLinux ${MAJORVERSION}.${MINORVERSION} (${DATE})" > $DRACOSRC_PKG/etc/draco-version || exit
+cat $DRACOSRC_PKG_SRC_DIR/motd > $DRACOSRC_PKG/etc/motd || exit 1
+echo > $DRACOSRC_PKG/etc/issue || exit 1 
+echo "DracoLinux ${MAJORVERSION}.${MINORVERSION} - \r (\l)" >> $DRACOSRC_PKG/etc/issue || exit 1
+echo >> $DRACOSRC_PKG/etc/issue || exit 1

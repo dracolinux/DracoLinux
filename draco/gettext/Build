@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="gettext"
+DRACOSRC_PKG_VERSION="0.17"
+DRACOSRC_PKG_BUILD=8
+DRACOSRC_PKG_DESC="GNU internationalization library"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --infodir=/usr/info --disable-static"

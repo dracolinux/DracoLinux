@@ -1,0 +1,6 @@
+mkdir -p $DRACOSRC_PKG/bin || exit 1
+mv $DRACOSRC_PKG/usr/bin/bash $DRACOSRC_PKG/bin/bash2.new || exit 1
+strip --strip-unneeded $DRACOSRC_PKG/bin/bash2.new
+rm -rf $DRACOSRC_PKG/usr/bin $DRACOSRC_PKG/usr/man/man1/bashbug.1
+#mkdir -p $DRACOSRC_PKG/etc/skel || exit 1
+#cat $DRACOSRC_PKG_SRC_DIR/bashrc > $DRACOSRC_PKG/etc/skel/.bashrc || exit 1

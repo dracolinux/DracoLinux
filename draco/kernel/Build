@@ -1,0 +1,6 @@
+$RUN ${DRACOSRC_DIR}/common/linux30/Build
+DRACOSRC_PKG_NAME=kernel
+DRACOSRC_PKG_DESC="The Linux kernel v3"
+LOCAL_KERNEL=
+DRACOSRC_PKG_BUILD=4
+KERNEL_CONFIG=config-generic

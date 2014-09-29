@@ -1,0 +1,90 @@
+#!/bin/sh
+#
+# DracoPKG
+#
+# Copyright 2008 Ole Andre Rodlie <olear@dracolinux.org>
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+#  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO
+#  EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+#  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+#  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+T_PX=$1
+TMP=/var/log/setup/tmp
+MOUNT=/var/log/mount
+FAKEMOUNT=/mnt/cdrom
+
+# Install packages
+#if [ -d ${MOUNT}/packages/All ]; then
+#  dialog --title "INSTALLING THIRD-PARTY PACKAGES" --infobox  \
+#  "Installing third-party packages, please wait ..." 3 54 
+#  sleep 1
+#  PACKAGES="draco-server draco-desktop drako-desktop draco-legacy draco-netbook draco-box draco-atom"
+#  mount -o bind $MOUNT ${T_PX}${FAKEMOUNT}
+#  for i in $PACKAGES ; do
+#    chroot $T_PX /usr/local/sbin/pkg_add $FAKEMOUNT/packages/All/$i > /dev/null 2>&1
+#  done
+#  umount ${T_PX}${FAKEMOUNT}
+#fi
+
+# Update modules
+chroot $T_PX /sbin/depmod -a
+
+# Configure services
+#SRV=$T_PX/usr/local/etc/rc.d
+#RCC=$T_PX/etc/rc.conf
+
+#if [ -x $SRV/openntpd ]; then
+#  echo openntpd=YES >> $RCC
+#fi
+
+#if [ -x $SRV/sshd ]; then
+#  echo sshd=YES >> $RCC
+#fi
+
+#if [ -x $SRV/cupsd ]; then
+#  echo cupsd=YES >> $RCC
+#fi
+
+#if [ -x $SRV/dbus ]; then
+#  echo dbus=YES >> $RCC
+#fi
+
+#if [ -x $SRV/hald ]; then
+#  echo hald=YES >> $RCC  
+#  #( cd ${T_PX}/usr/local/etc/dbus-1/system.d ;
+#    #sed -i 's/<policy user="0">/<policy group="plugdev">/g' hal.conf
+#  #  cat hal.conf | sed 's/<policy user="0">/<policy group="plugdev">/g' > hal.conf.new
+#  #  mv hal.conf.new hal.conf
+#  #)
+#fi
+
+#if [ -x $SRV/hcid ]; then
+#  echo hcid=YES >> $RCC
+#fi
+
+#if [ -x $SRV/wicd ]; then
+#  echo wicd=YES >> $RCC
+#fi
+
+#if [ -x $SRV/kdm ]; then
+#  echo kdm=YES >> $RCC
+#else
+#  if [ -x $SRV/slim ]; then
+#    echo slim=YES >> $RCC
+#  fi
+#fi
+

@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="bc"
+DRACOSRC_PKG_VERSION="1.06.95"
+DRACOSRC_PKG_BUILD=7
+DRACOSRC_PKG_DESC="An arbitrary precision calculator language"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --sysconfdir=/etc --mandir=/usr/man --with-readline --program-prefix= --program-suffix= --build=$DRACOSRC_ARCH-draco-linux"

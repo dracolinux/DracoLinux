@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="minicom"
+DRACOSRC_PKG_VERSION=2.6.1
+DRACOSRC_PKG_BUILD=3
+DRACOSRC_PKG_DESC="Serial communication program"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --sysconfdir=/etc"

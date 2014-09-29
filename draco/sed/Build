@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="sed"
+DRACOSRC_PKG_VERSION="4.1.5"
+DRACOSRC_PKG_BUILD=9
+DRACOSRC_PKG_DESC="This is the GNU version of sed, a stream editor"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr"

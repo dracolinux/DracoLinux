@@ -1,0 +1,43 @@
+
+KVER=$(uname -r)
+BUILD_DIR=$DRACOSRC_PKG_WORK/oss-build
+mkdir -p $BUILD_DIR || exit 1
+cd $BUILD_DIR || exit 1
+
+CFLAGS="$DRACOSRC_FLAGS" \
+/${DRACOSRC_PKG_SRC}/configure || exit 1
+
+find . -type f -name "Makefile" -exec sed -i "s,-O6,$DRACOSRC_FLAGS,g" {} \;
+find . -type f -name "srcconf.c" -exec sed -i "s,-O6,$DRACOSRC_FLAGS,g" {} \;
+
+make -j3 build || exit 1
+
+( cd prototype/usr/lib/oss/lib ;
+  chmod 644 flashsupport.c
+  cc -shared $DRACOSRC_FLAGS -lssl flashsupport.c -o libflashsupport.so
+#  rm -f flashsupport.c
+)
+
+rm -rf prototype/usr/lib/oss/cuckoo
+cp -aR prototype/* $DRACOSRC_PKG || exit 1
+rm -f $DRACOSRC_PKG/usr/lib/oss/etc/S89oss
+
+( cd $DRACOSRC_PKG/usr/lib/oss/build ; patch -p0 < $DRACOSRC_PKG_SRC_DIR/this-is-called-slackware.diff )
+( cd $DRACOSRC_PKG/usr/sbin : patch -p0 < $DRACOSRC_PKG_SRC_DIR/dont-use-broken-libsalsa.diff )
+( cd $DRACOSRC_PKG/usr/lib ; ln -sf oss/lib/libflashsupport.so . )
+
+( cd $DRACOSRC_PKG/usr ;
+  mv share/man .
+  rm -rf share
+  ( cd lib/oss ; 
+    mv conf.tmpl conf
+#    rm -rf modules* objects* build
+  )
+)
+
+
+
+mkdir -p $DRACOSRC_PKG/etc/rc.d
+mkdir -p $DRACOSRC_PKG/usr/bin
+cat $DRACOSRC_PKG_SRC_DIR/rc.oss > $DRACOSRC_PKG/etc/rc.d/rc.oss.new || exit 1
+chmod 755 $DRACOSRC_PKG/etc/rc.d/rc.oss.new

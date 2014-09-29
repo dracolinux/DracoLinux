@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="make"
+DRACOSRC_PKG_VERSION="3.81"
+DRACOSRC_PKG_BUILD=9
+DRACOSRC_PKG_DESC="GNU make utility to maintain groups of programs"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr $DRACOSRC_ARCH-draco-linux"

@@ -1,0 +1,15 @@
+# /lib/udev/rules.d/40-draco.rules
+#
+# Any change in this file will be overwritten in upgrades. Put your
+# custom rules somewhere else (90-local.rules is a good idea).
+#
+# See the udev man page to know the parameters you can use in udev
+# rules.
+#
+
+# input devices
+KERNEL=="mice",		SYMLINK+="mouse"
+
+# Set rfkill device writable by netdev group
+KERNEL=="rfkill", GROUP:="netdev", MODE:="0664"
+

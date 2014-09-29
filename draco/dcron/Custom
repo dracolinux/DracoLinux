@@ -1,0 +1,19 @@
+
+make || exit 1
+strip crond crontab
+
+mkdir -p $DRACOSRC_PKG/usr/{sbin,bin,man}
+mkdir -p $DRACOSRC_PKG/usr/man/{man1,man8}
+mkdir -p $DRACOSRC_PKG/var/spool/cron/crontabs
+mkdir -p $DRACOSRC_PKG/etc/{cron.daily,cron.hourly,cron.monthly,cron.weekly}
+
+cat crond > $DRACOSRC_PKG/usr/sbin/crond
+cat crontab > $DRACOSRC_PKG/usr/bin/crontab
+cat $DRACOSRC_PKG_SRC_DIR/run-parts > $DRACOSRC_PKG/usr/bin/run-parts
+cat crontab.1 > $DRACOSRC_PKG/usr/man/man1/crontab.1
+cat crond.8 > $DRACOSRC_PKG/usr/man/man8/crond.8
+cat $DRACOSRC_PKG_SRC_DIR/run-parts.8 > $DRACOSRC_PKG/usr/man/man8/run-parts.8
+cat $DRACOSRC_PKG_SRC_DIR/root > $DRACOSRC_PKG/var/spool/cron/crontabs/root.new
+
+chmod 755 $DRACOSRC_PKG/usr/sbin/*
+chmod 755 $DRACOSRC_PKG/usr/bin/*

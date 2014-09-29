@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="gpm"
+DRACOSRC_PKG_VERSION="1.20.1.1"
+DRACOSRC_PKG_BUILD=6
+DRACOSRC_PKG_DESC="Mouse server for console and xterm"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --sysconfdir=/etc $DRACOSRC_ARCH-draco-linux"

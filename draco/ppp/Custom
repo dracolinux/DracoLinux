@@ -1,0 +1,21 @@
+
+./configure $DRACOSRC_PKG_CONFIGURE
+make || exit 1
+make install DESTDIR=$DRACOSRC_PKG/usr || exit 1
+
+( cd $DRACOSRC_PKG/usr ;
+  mv share/man .
+  rm -rf share
+)
+
+mkdir -p $DRACOSRC_PKG/etc/ppp
+cp -av etc.ppp/* $DRACOSRC_PKG/etc/ppp/ || exit 1
+chmod 600 $DRACOSRC_PKG/etc/ppp/*secrets || exit 1
+
+( cd $DRACOSRC_PKG/etc/ppp ;
+  mv chap-secrets chap-secrets.new
+  mv options options.new
+  mv pap-secrets pap-secrets.new
+)
+
+chmod 755 $DRACOSRC_PKG/usr/lib/pppd/*/*.so || exit 1

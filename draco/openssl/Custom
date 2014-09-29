@@ -1,0 +1,29 @@
+
+./config $DRACOSRC_PKG_CONFIGURE
+
+make depend || exit 1
+make || exit 1
+make install INSTALL_PREFIX=$DRACOSRC_PKG || exit 1
+
+mkdir -p $DRACOSRC_PKG/etc/cron.daily
+cat $DRACOSRC_PKG_SRC_DIR/certwatch > $DRACOSRC_PKG/etc/cron.daily/certwatch.new || exit 1
+chmod 755 $DRACOSRC_PKG/etc/cron.daily/certwatch.new
+
+( cd $DRACOSRC_PKG/etc/ssl ; mv openssl.cnf openssl.cnf.new )
+
+( cd $DRACOSRC_PKG/usr/lib ; 
+  ldconfig -l * 2> /dev/null
+  ln -sf libcrypto.so.0 libcrypto.so
+  ln -sf libssl.so.0 libssl.so
+)
+
+mv $DRACOSRC_PKG/etc/ssl/man $DRACOSRC_PKG/usr || exit 1
+
+( cd $DRACOSRC_PKG/usr/man ;
+  ( cd man1 ; mv passwd.1 ssl_passwd.1 )
+  ( cd man3 ; 
+    mv rand.3 ssl_rand.3
+    mv err.3 ssl_err.3
+  )
+)
+

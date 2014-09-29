@@ -1,0 +1,1 @@
+mv $DRACOSRC_PKG/usr/share/info $DRACOSRC_PKG/usr || exit 1

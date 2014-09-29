@@ -1,0 +1,6 @@
+DRACOSRC_PKG_NAME=udev
+DRACOSRC_PKG_VERSION=165
+DRACOSRC_GLIB=2.28.6
+DRACOSRC_PKG_BUILD=4
+DRACOSRC_PKG_DESC="Dynamic device directory system"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --bindir=/bin --sbindir=/sbin --enable-static --libexecdir=/lib/udev --disable-introspection --sysconfdir=/etc --mandir=/usr/man $DRACOSRC_ARCH-draco-linux"

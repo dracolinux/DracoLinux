@@ -1,0 +1,15 @@
+
+mv $DRACOSRC_PKG/usr/share/doc $DRACOSRC_PKG/usr || exit 1
+mv $DRACOSRC_PKG/usr/doc/xfsprogs $DRACOSRC_PKG/usr/doc/xfsprogs-$DRACOSRC_PKG_VERSION || exit 1
+
+rm -f $DRACOSRC_PKG/lib/*.a $DRACOSRC_PKG/lib/*.so $DRACOSRC_PKG/lib/*.la $DRACOSRC_PKG/usr/lib/*.la
+
+if [ -f $DRACOSRC_PKG/lib/libhandle.so.1 ]; then
+  ( cd $DRACOSRC_PKG/usr/lib ; rm -f libhandle.so ; ln -sf /lib/libhandle.so.1 libhandle.so )
+else
+  exit 1
+fi
+
+chmod 755 $DRACOSRC_PKG/lib/*
+
+strip -g $DRACOSRC_PKG/usr/lib/*.a

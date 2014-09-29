@@ -1,0 +1,99 @@
+--- soundon~	2008-02-26 04:38:50.000000000 +0100
++++ soundon	2008-02-28 13:41:06.000000000 +0100
+@@ -14,10 +14,10 @@
+ 
+ if test -f $OSSLIBDIR/starting
+ then
+-	echo Previous start of OSS crashed the system
+-	echo Please resolve the situation and remove file
+-	echo \"$OSSLIBDIR/starting\". Then start OSS by
+-	echo running soundon again.
++	echo "Previous start of OSS crashed the system"
++	echo "Please resolve the situation and remove file"
++	echo "\"$OSSLIBDIR/starting\". Then start OSS by"
++	echo "running soundon again."
+ 	exit 1
+ fi
+ 
+@@ -64,9 +64,9 @@
+ if ! test -f /lib/modules/`uname -r`/kernel/oss/osscore.ko
+ then
+ 	NOTIFY=1
+-	echo Relinking OSS kernel modules for \"$KERNEL_VERMAGIC\"
+-	echo This may take few moments - please stand by...
+-	echo Relinking OSS kernel modules for $KERNEL_VERMAGIC >> $LOG
++	echo "Relinking OSS kernel modules for \"$KERNEL_VERMAGIC\""
++	echo "This may take few moments - please stand by..."
++	echo "Relinking OSS kernel modules for $KERNEL_VERMAGIC" >> $LOG
+ 
+ 	rm -f $OSSLIBDIR/logs/relink.log
+ 	if ! (cd $OSSLIBDIR/build && sh install.sh > $OSSLIBDIR/logs/relink.log 2>&1)
+@@ -226,38 +226,39 @@
+   head -10 /proc/asound/version >> $LOG 2>&1
+   lsmod|grep snd >> $LOG
+   echo "**************************************" >> $LOG
+-else
+-# Use library based ALSA compatibility
+-
+-  if test -f $OSSLIBDIR/lib/libsalsa.so.2.0.0
+-  then
+-     if test "`uname -m` " = "x86_64 "
+-     then
+-       ln -sf $OSSLIBDIR/lib/libsalsa.so.2.0.0 /usr/lib64/libasound.so.2
+-       #ln -sf $OSSLIBDIR/lib/libOSSlib.so /usr/lib64
+-     else
+-       if test -s /lib/libasound.so.2
+-       then
+-         ln -sf $OSSLIBDIR/lib/libsalsa.so.2.0.0 /lib/libasound.so.2
+-         #ln -sf $OSSLIBDIR/lib/libOSSlib.so /lib
+-       fi
+-  
+-       if test -s /usr/lib/libasound.so.2
+-       then
+-         ln -sf $OSSLIBDIR/lib/libsalsa.so.2.0.0 /usr/lib/libasound.so.2
+-         #ln -sf $OSSLIBDIR/lib/libOSSlib.so /usr/lib
+-       fi
+-     fi
+-  fi
++#else
++# DO NOT "Use library based ALSA compatibility": this is NOT ready yet and
++# breaks far too many things.
++#
++#  if test -f $OSSLIBDIR/lib/libsalsa.so.2.0.0
++#  then
++#     if test "`uname -m` " = "x86_64 "
++#     then
++#       ln -sf $OSSLIBDIR/lib/libsalsa.so.2.0.0 /usr/lib64/libasound.so.2
++#       #ln -sf $OSSLIBDIR/lib/libOSSlib.so /usr/lib64
++#     else
++#       if test -s /lib/libasound.so.2
++#       then
++#         ln -sf $OSSLIBDIR/lib/libsalsa.so.2.0.0 /lib/libasound.so.2
++#         #ln -sf $OSSLIBDIR/lib/libOSSlib.so /lib
++#       fi
++#  
++#       if test -s /usr/lib/libasound.so.2
++#       then
++#         ln -sf $OSSLIBDIR/lib/libsalsa.so.2.0.0 /usr/lib/libasound.so.2
++#         #ln -sf $OSSLIBDIR/lib/libOSSlib.so /usr/lib
++#       fi
++#     fi
++#  fi
+ fi
+ 
+ # Setup Flash 9 audio support plugin for OSS
+-
+-if test -f $OSSLIBDIR/lib/libflashsupport.so
+-then
+-  rm -f /usr/lib/libflashsupport.so
+-  ln -sf $OSSLIBDIR/lib/libflashsupport.so /usr/lib/libflashsupport.so
+-fi
++# Actually, it has already been done.
++#if test -f $OSSLIBDIR/lib/libflashsupport.so
++#then
++#  rm -f /usr/lib/libflashsupport.so
++#  ln -sf $OSSLIBDIR/lib/libflashsupport.so /usr/lib/libflashsupport.so
++#fi
+ 
+ if test -x $OSSLIBDIR/soundon.user
+ then

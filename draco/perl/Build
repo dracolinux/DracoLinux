@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="perl"
+DRACOSRC_PKG_VERSION="5.8.8"
+DRACOSRC_PKG_BUILD=9
+DRACOSRC_PKG_DESC="Practical Extraction and Report Language"
+#DRACOSRC_PKG_CONFIGURE="-de -Dprefix=/usr -Dcccdlflags='-fPIC' -Dinstallprefix=/usr -Doptimize='-O2 -march=i486 -mtune=i686' -Dusethreads -Duseithreads -Dpager='/usr/bin/less -isr' -Dinc_version_list='5.8.7 5.8.6 5.8.5 5.8.4 5.8.3 5.8.2 5.8.1 5.8.0' -Darchname=$DRACOSRC_ARCH-linux"

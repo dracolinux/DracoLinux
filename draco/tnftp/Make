@@ -1,0 +1,13 @@
+make || exit 1
+make prefix=$DRACOSRC_PKG/usr install || exit 1
+mkdir -p $DRACOSRC_PKG/bin || exit 1
+( cd $DRACOSRC_PKG/usr ;
+  mv share/man .
+  mkdir -p man/man1
+  cp man/cat1/* man/man1/
+  rm -rf man/cat*
+  rm -rf share
+)
+mv $DRACOSRC_PKG/usr/bin/tnftp $DRACOSRC_PKG/bin/ftp || exit 1
+mv $DRACOSRC_PKG/usr/man/man1/tnftp.1 $DRACOSRC_PKG/usr/man/man1/ftp.1 || exit 1
+( cd $DRACOSRC_PKG/usr/bin ; ln -sf ../../bin/ftp ftp )

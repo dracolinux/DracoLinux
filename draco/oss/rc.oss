@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# Open Sound System for Draco
+# Written by Ole Andre Rodlie <olear@dracolinux.org>
+
+case "$1" in
+  start)
+    if [ -x /usr/sbin/soundon ]; then
+      /usr/sbin/soundon
+      
+      # Forces virtual mixer, uncomment to enable hw mixer (on supported cards).
+      # VMIX MOVED TO CORE SINCE 4.0.1016
+      /bin/grep '^softoss' /proc/modules >/dev/null 2>/dev/null
+      if [ $? -eq 0 ]; then
+        /sbin/rmmod softoss
+        /sbin/modprobe vmix
+        /bin/sed -i 's/^softoss.*$/vmix/' /usr/lib/oss/etc/installed_drivers
+      fi
+      
+      # Compatibility with applications, most use /dev/dsp. This will work on most HD Audio cards, 
+      # on workstations it will be FRONT, on laptops SPEAKER or OUT. 
+      # Check your card with 'ossinfo', and replace dsp0 with the right device.
+      if [ -a /dev/dsp0 ]; then
+        ( cd /dev ; ln -sf dsp0 dsp )
+      fi
+      
+      # Compatibility with audio mixers, HD Audio may need adjustments, check 'ossinfo'.
+      if [ -a /dev/mixer0 ]; then
+        ( cd /dev ; ln -sf mixer0 mixer )
+      fi
+      
+    fi
+  ;;
+  stop)
+    if [ -x /usr/sbin/soundoff ]; then
+      devs=`/usr/bin/perl -e '{while (<>) {m/^(\S*)/; print "/dev/$1\n"}}' < /proc/opensound/devfiles`
+      fuser -k ${devs}  >/dev/null 2>/dev/null
+      #sh /usr/lib/oss/scripts/killprocs.sh
+      /usr/sbin/soundoff
+    fi
+  ;;
+  restart)
+    $0 stop
+    $0 start
+  ;;
+  *)
+    echo "Usage: $0 {start|stop|restart}"
+    exit 1
+esac
+

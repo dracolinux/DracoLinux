@@ -1,0 +1,200 @@
+#!/bin/sh
+TMP=/var/log/setup/tmp
+# Here's the default kernel install location:
+KERNEL=/boot/vmlinuz
+if [ -d /cdrom/kernels -o -d /cdrom/isolinux/kernel ]; then
+  DEF=cdrom
+else
+  DEF=bootdisk
+fi
+unset ITEM
+
+# If someone tries to install kernels from a CD that doesn't contain any,
+# we'll give them one chance to find a disc that does.
+swapdisks() {
+  CDDEVICE=`cat $TMP/SeTCDdev`
+  umount $CDDEVICE 1> /dev/null 2> /dev/null
+  eject $CDDEVICE
+  dialog --title "REINSERT KERNEL DISC" --msgbox \
+"Please reinsert the Draco disc containing the collection \
+of Linux kernels.  Usually this is disc number one (the disc \
+that you boot from).  Once you've inserted the disc, hit ENTER \
+to continue." \
+8 61
+  mount $CDDEVICE /var/log/mount 1> /dev/null 2> /dev/null
+}
+
+if [ ! -d $TMP ]; then
+  mkdir -p $TMP
+fi
+while [ 0 ]; do
+ dialog --title "INSTALL LINUX KERNEL" --default-item $DEF --menu \
+"In order for your system to \
+boot correctly, a kernel must be installed.  If you've made it this far \
+using the installation bootdisk's kernel, you should probably install \
+it as your system kernel ($KERNEL).  If you're sure you know what you're \
+doing, you can also install your choice of kernels from the Draco CD, \
+NFS (if the whole Draco tree was exported) or a kernel from a floppy \
+disk.  You can also skip this menu, using whatever kernel has been \
+installed already (which will be the generic kernel from \
+the A series).  Which option would you like?" 19 73 4 \
+"bootdisk" "Use the kernel from the installation bootdisk" \
+"cdrom" "Use a kernel from the Draco CD or NFS mount" \
+"floppy" "Install a zimage or bzimage from a DOS floppy" \
+"skip" "Skip this menu (use the default $KERNEL)" 2> $TMP/SeTreturn
+ if [ ! $? = 0 ]; then
+  break
+ fi
+ if [ "`cat $TMP/SeTreturn`" = "bootdisk" ]; then
+  dialog --title "INSERT INSTALLATION BOOTDISK" --msgbox "Please \
+insert your installation bootdisk in /dev/fd0 (drive a:) and press ENTER \
+to continue." 7 50
+  # This kludge allows 1.44 or 1.68 floppies to work right
+  chroot $T_PX /usr/bin/mdir a: 1> /dev/null 2> /dev/null
+  mount /dev/fd0 /floppy -t vfat 2> /dev/null
+  if [ ! $? = 0 ]; then
+    mount /dev/fd0 /floppy 2> /dev/null
+  fi
+  if [ -r /floppy/vmlinuz ]; then
+   dialog --title "COPYING" --infobox \
+"Copying kernel from bootdisk to $KERNEL on your new system...\n" 0 0
+   rm -f $T_PX/$KERNEL
+   cp /floppy/vmlinuz $T_PX/$KERNEL
+   chmod 400 $T_PX/$KERNEL
+   rdev -R $T_PX/$KERNEL 1
+   rdev $T_PX/$KERNEL $ROOT_DEVICE > /dev/null 2> /dev/null
+   rdev -r $T_PX/$KERNEL 0
+   umount /floppy
+   break;
+  else
+   umount /floppy
+   dialog --title "ERROR: LINUX KERNEL NOT FOUND" --msgbox "Sorry, but a \
+Linux kernel could not be installed since no file named /vmlinuz could be \
+found on the floppy.  Did you insert the installation bootdisk?  Please \
+hit ENTER to return to the kernel installation menu." 8 70
+  fi 
+ elif [ "`cat $TMP/SeTreturn`" = "cdrom" ]; then
+  # This assumes symlinks /nfs and /cdrom both pointing to /var/log/mount :
+  if `mount |grep -q "type nfs"`; then PLINK=nfs; else PLINK=cdrom; fi
+  if [ ! -d /$PLINK/kernels -a ! -d /$PLINK/isolinux/kernel -a ! -r $TMP/SeTCDdev ]; then
+   dialog --title "ERROR" --msgbox "Sorry, but the directories /$PLINK/kernels \
+and /$PLINK/isolinux/kernel were not found.  Are you installing from a Draco CD?  \
+If not, you'll have to install your kernel from a floppy, a bootdisk, or the A series." \
+0 0
+  else
+   if [ $PLINK = cdrom -a ! -d /$PLINK/kernels -a ! -d /$PLINK/isolinux/kernel ]; then
+    swapdisks
+   fi
+   # flunk
+   if [ ! -d /$PLINK/kernels -a ! -d /$PLINK/isolinux/kernel ]; then
+    continue # you'll have to try that again...
+   fi
+   if [ ! "$SLACK_KERNEL" = "" ]; then
+    if [ -r /$PLINK/isolinux/kernel/$SLACK_KERNEL ]; then
+     ITEM=" --default-item /$PLINK/isolinux/kernel/$SLACK_KERNEL "
+    elif [ -r /$PLINK/kernels/$SLACK_KERNEL/bzImage ]; then
+     ITEM=" --default-item /$PLINK/kernels/$SLACK_KERNEL/bzImage "
+    fi
+   fi
+   cat << EOF > $TMP/tempscript
+dialog --title "CHOOSE LINUX KERNEL" $ITEM --menu "Which of the following \\
+kernels would you like to install?  NOTE: If \\
+you have a SCSI controller, choose a kernel that supports that.  You \\
+can support your CD-ROM drive and network card later with installable \\
+kernel modules." \\
+18 70 8 \\
+EOF
+   for file in /$PLINK/isolinux/kernel/* /$PLINK/kernels/*/*zImage ; do
+    if [ -r $file ]; then
+     echo "\"$file\" \"\" \\" >> $TMP/tempscript
+    fi
+   done
+   echo "2> $TMP/SeTreturn" >> $TMP/tempscript
+   . $TMP/tempscript
+   if [ ! $? = 0 ]; then
+    continue;
+   fi
+   file=`cat $TMP/SeTreturn`
+   dialog --title "COPYING" --infobox \
+"Copying kernel from $file to $KERNEL on your new system...\n" 0 0
+   rm -f $T_PX/$KERNEL
+   cp $file $T_PX/$KERNEL
+   chmod 400 $T_PX/$KERNEL
+   rdev -R $T_PX/$KERNEL 1
+   rdev $T_PX/$KERNEL $ROOT_DEVICE > /dev/null 2> /dev/null
+   rdev -r $T_PX/$KERNEL 0
+   # Add extra files:
+   rm -f $T_PX/boot/System.map
+   zcat $(dirname $file)/System.map.gz > $T_PX/boot/System.map
+   rm -f $T_PX/boot/config
+   cat $(dirname $file)/config > $T_PX/boot/config
+   break;
+  fi
+ elif [ "`cat $TMP/SeTreturn`" = "floppy" ]; then
+  dialog --title "INSERT DISK" --msgbox "Now we will install a Linux \
+kernel from floppy disk.  Please insert an MSDOS formatted floppy disk \
+containing a kernel file \"VMLINUZ\", \"ZIMAGE\" or \"BZIMAGE\" and \
+press ENTER to continue." 8 60
+  # This kludge allows 1.44 or 1.68 floppies to work right
+  chroot $T_PX /usr/bin/mdir a: 1> /dev/null 2> /dev/null
+  mount /dev/fd0 /floppy -t vfat
+  if [ -r /floppy/zimage ]; then
+   dialog --title "COPYING" --infobox \
+"Copying kernel from floppy disk to $KERNEL on your new system...\n" 0 0
+   rm -f $T_PX/$KERNEL
+   cp /floppy/zimage $T_PX/$KERNEL
+   chmod 400 $T_PX/$KERNEL
+   rdev -R $T_PX/$KERNEL 1
+   rdev $T_PX/$KERNEL $ROOT_DEVICE > /dev/null 2> /dev/null
+   rdev -r $T_PX/$KERNEL 0
+   umount /floppy
+   break;
+  elif [ -r /floppy/vmlinuz ]; then
+   dialog --title "COPYING" --infobox \
+"Copying kernel from floppy disk to $KERNEL on your new system...\n" 0 0
+   rm -f $T_PX/$KERNEL
+   cp /floppy/vmlinuz $T_PX/$KERNEL
+   chmod 400 $T_PX/$KERNEL
+   rdev -R $T_PX/$KERNEL 1
+   rdev $T_PX/$KERNEL $ROOT_DEVICE > /dev/null 2> /dev/null
+   rdev -r $T_PX/$KERNEL 0
+   umount /floppy
+   break;
+  elif [ -r /floppy/bzimage ]; then
+   dialog --title "COPYING" --infobox \
+"Copying kernel from floppy disk to $KERNEL on your new system...\n" 0 0
+   rm -f $T_PX/$KERNEL
+   cp /floppy/bzimage $T_PX/$KERNEL
+   chmod 400 $T_PX/$KERNEL
+   rdev -R $T_PX/$KERNEL 1
+   rdev $T_PX/$KERNEL $ROOT_DEVICE > /dev/null 2> /dev/null
+   rdev -r $T_PX/$KERNEL 0
+   umount /floppy
+   break;
+  else
+   umount /floppy
+   dialog --title "ERROR: LINUX KERNEL NOT FOUND" --msgbox "Sorry, but a \
+Linux kernel could not be installed since no file named /zimage or \
+/bzimage could be found on the floppy.  Did you insert an MSDOS formatted \
+floppy disk containing such a file?  Please hit ENTER to return to the kernel \
+installation menu." 8 70
+  fi
+ elif [ "`cat $TMP/SeTreturn`" = "skip" ]; then
+  if [ ! -r $T_PX/$KERNEL ]; then
+   dialog --title "CONTINUE WITHOUT A KERNEL?" --yesno "WARNING: no Linux \
+kernel is currently installed on your system, so generating a bootdisk and \
+LILO installation are not going to work -- if you continue without an \
+installed kernel you'll need to have some other means of booting your system. \
+LOADLIN or the installation bootdisk will work.  If you're sure you want to \
+continue without installing a kernel, select YES.  Otherwise, select NO \
+and you'll be returned to the kernel installation menu." 12 65 
+   if [ $? = 0 ]; then
+    break;
+   else
+    continue;
+   fi
+  fi # no kernel
+  break;
+ fi # skip option
+done
+rm -f $TMP/SeTreturn

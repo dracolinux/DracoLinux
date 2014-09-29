@@ -1,0 +1,35 @@
+
+mkdir -p $DRACOSRC_PKG/usr/{bin,sbin} || exit 1
+mkdir -p $DRACOSRC_PKG/usr/man/man{1,8} || exit 1
+
+( cd rsh ;
+  cat rsh > $DRACOSRC_PKG/usr/bin/rsh
+  cat rsh.1 > $DRACOSRC_PKG/usr/man/man1/rsh.1
+)
+
+( cd rshd ;
+  cat rshd > $DRACOSRC_PKG/usr/sbin/in.rshd
+  cat rshd.8 > $DRACOSRC_PKG/usr/man/man8/in.rshd.8
+)
+
+( cd rcp ;
+  cat rcp > $DRACOSRC_PKG/usr/bin/rcp
+  cat rcp.1 > $DRACOSRC_PKG/usr/man/man1/rcp.1
+)
+
+( cd rexecd ;
+  cat rexecd > $DRACOSRC_PKG/usr/sbin/in.rexecd
+  cat rexecd.8 > $DRACOSRC_PKG/usr/man/man8/rexecd.8
+)
+
+( cd rlogin ;
+  cat rlogin > $DRACOSRC_PKG/usr/bin/rlogin
+  cat rlogin.1 > $DRACOSRC_PKG/usr/man/man1/rlogin.1
+)
+
+( cd rlogind ;
+  cat rlogind > $DRACOSRC_PKG/usr/sbin/in.rlogind
+  cat rlogind.8 > $DRACOSRC_PKG/usr/man/man8/in.rlogind.8
+)
+
+chmod 755 $DRACOSRC_PKG/usr/sbin/* $DRACOSRC_PKG/usr/bin/*

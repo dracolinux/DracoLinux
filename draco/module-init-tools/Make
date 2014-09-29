@@ -1,0 +1,47 @@
+make -j4 || exit 1
+
+mkdir -p $DRACOSRC_PKG/sbin || exit 1
+
+cat depmod > $DRACOSRC_PKG/sbin/depmod || exit 1
+cat generate-modprobe.conf > $DRACOSRC_PKG/sbin/generate-modprobe.conf || exit 1
+cat insmod > $DRACOSRC_PKG/sbin/insmod || exit 1
+cat insmod.static > $DRACOSRC_PKG/sbin/insmod.static || exit 1
+cat lsmod > $DRACOSRC_PKG/sbin/lsmod || exit 1
+cat modinfo > $DRACOSRC_PKG/sbin/modinfo || exit 1
+cat modprobe > $DRACOSRC_PKG/sbin/modprobe || exit 1
+cat rmmod > $DRACOSRC_PKG/sbin/rmmod || exit 1
+
+chmod 755 $DRACOSRC_PKG/sbin/*
+
+mkdir -p $DRACOSRC_PKG/bin || exit 1
+( cd $DRACOSRC_PKG/bin ; ln -sf ../sbin/lsmod . )
+
+mkdir -p $DRACOSRC_PKG/usr/man/man{5,8} || exit 1
+for file in *.5 ; do
+  cat $file > $DRACOSRC_PKG/usr/man/man5/$file
+done
+
+for file in *.8 ; do
+  cat $file > $DRACOSRC_PKG/usr/man/man8/$file
+done
+
+mkdir -p $DRACOSRC_PKG/etc/cron.hourly || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/kmod > $DRACOSRC_PKG/etc/cron.hourly/kmod || exit 1
+chmod 755 $DRACOSRC_PKG/etc/cron.hourly/kmod
+
+cat << EOF > $DRACOSRC_PKG/etc/modprobe.conf.new
+# /etc/modprobe.conf (old location for Linux 2.6+ config)
+#
+# The use of this config file is deprecated.
+# Instead, create files in the /etc/modprobe.d/ directory
+# containing modprobe options.
+#
+# For more information, see "man modprobe.conf".
+EOF
+
+mkdir -p $DRACOSRC_PKG/etc/modprobe.d/ || exit 1
+
+if [ -f $DRACOSRC_PKG/usr/man/man5/modprobe.conf.5 -a ! -e $DRACOSRC_PKG/usr/man/man5/modprobe.d.5 ]; then
+  ( cd $DRACOSRC_PKG/usr/man/man5 ; ln -sf modprobe.conf.5 modprobe.d.5 )
+fi
+

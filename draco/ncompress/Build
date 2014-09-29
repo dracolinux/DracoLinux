@@ -1,0 +1,4 @@
+DRACOSRC_PKG_NAME="ncompress"
+DRACOSRC_PKG_VERSION="4.2.4"
+DRACOSRC_PKG_BUILD=7
+DRACOSRC_PKG_DESC="The classic *nix compression utility"

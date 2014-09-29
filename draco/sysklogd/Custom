@@ -1,0 +1,27 @@
+
+make || exit 1
+make syslog_tst || exit 1
+
+mkdir -p $DRACOSRC_PKG/usr/sbin || exit 1
+mkdir -p $DRACOSRC_PKG/usr/man/{man5,man8} || exit 1
+mkdir -p $DRACOSRC_PKG/etc/{logrotate.d,rc.d} || exit 1
+mkdir -p $DRACOSRC_PKG/var/log || exit 1
+
+touch $DRACOSRC_PKG/var/log/cron.new || exit 1
+touch $DRACOSRC_PKG/var/log/debug.new || exit 1
+touch $DRACOSRC_PKG/var/log/maillog.new || exit 1
+touch $DRACOSRC_PKG/var/log/messages.new || exit 1
+touch $DRACOSRC_PKG/var/log/secure.new || exit 1
+touch $DRACOSRC_PKG/var/log/spooler.new || exit 1
+touch $DRACOSRC_PKG/var/log/syslog.new || exit 1
+
+make INSTALL=/bin/install BINDIR=$DRACOSRC_PKG/usr/sbin MANDIR=$DRACOSRC_PKG/usr/man install || exit 1
+
+
+cat syslog_tst > $DRACOSRC_PKG/usr/sbin/syslog_tst
+
+cat $DRACOSRC_PKG_SRC_DIR/syslog.conf.new > $DRACOSRC_PKG/etc/syslog.conf.new || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/rc.syslog.new > $DRACOSRC_PKG/etc/rc.d/rc.syslog.new || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/syslog.new > $DRACOSRC_PKG/etc/logrotate.d/syslog.new || exit 1
+
+chmod 755 $DRACOSRC_PKG/etc/rc.d/*

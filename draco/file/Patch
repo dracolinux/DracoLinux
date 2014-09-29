@@ -1,0 +1,1 @@
+cat $DRACOSRC_PKG_SRC_DIR/file.zisofs.magic >> magic/Magdir/compress || exit 1

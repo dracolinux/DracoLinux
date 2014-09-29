@@ -1,0 +1,7 @@
+
+make || exit 1
+mkdir -p $DRACOSRC_PKG/usr/bin
+cat traceroute > $DRACOSRC_PKG/usr/bin/traceroute || exit 1
+chmod 4711 $DRACOSRC_PKG/usr/bin/traceroute || exit 1
+mkdir -p $DRACOSRC_PKG/usr/man/man8
+cat traceroute.8 > $DRACOSRC_PKG/usr/man/man8/traceroute.8 || exit 1

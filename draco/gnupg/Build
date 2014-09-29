@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME=gnupg
+DRACOSRC_PKG_VERSION=1.4.12
+DRACOSRC_PKG_BUILD=1
+DRACOSRC_PKG_DESC="GNU tools for secure communication and storage."
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --infodir=/usr/info --mandir=/usr/man $DRACOSRC_ARCH-draco-linux"

@@ -1,0 +1,31 @@
+
+make -j3 || exit 1
+
+mkdir -p $DRACOSRC_PKG/sbin $DRACOSRC_PKG/usr/sbin
+
+cat lspci > $DRACOSRC_PKG/sbin/lspci || exit 1
+cat setpci > $DRACOSRC_PKG/sbin/setpci || exit 1
+chmod 755 $DRACOSRC_PKG/sbin/* || exit 1
+
+#patch -p1 < $DRACOSRC_PKG_SRC_DIR/pciutils.ids.dest.diff.gz || exit 1
+
+#sh update-pciids.sh || exit 1
+
+mkdir -p $DRACOSRC_PKG/usr/share
+cat $DRACOSRC_PKG_SRC_DIR/pci.ids > $DRACOSRC_PKG/usr/share/pci.ids || exit 1
+cat update-pciids.sh > $DRACOSRC_PKG/usr/sbin/update-pciids || exit 1
+chmod 755 $DRACOSRC_PKG/usr/sbin/update-pciids || exit 1
+
+mkdir -p $DRACOSRC_PKG/usr/include/pci
+for file in config.h header.h pci.h types.h ; do
+  cp -a lib/$file $DRACOSRC_PKG/usr/include/pci || exit 1
+done
+
+mkdir -p $DRACOSRC_PKG/usr/lib
+cat lib/libpci.a > $DRACOSRC_PKG/usr/lib/libpci.a || exit 1
+
+mkdir -p $DRACOSRC_PKG/usr/man/man8
+cat lspci.8 > $DRACOSRC_PKG/usr/man/man8/lspci.8 || exit 1
+cat setpci.8 > $DRACOSRC_PKG/usr/man/man8/setpci.8 || exit 1
+
+

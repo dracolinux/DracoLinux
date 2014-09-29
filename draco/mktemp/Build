@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="mktemp"
+DRACOSRC_PKG_VERSION="1.5"
+DRACOSRC_PKG_BUILD=6
+DRACOSRC_PKG_DESC="A utility to create unique temporary filenames"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr"

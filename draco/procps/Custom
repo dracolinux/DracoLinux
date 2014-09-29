@@ -1,0 +1,36 @@
+make || exit 1
+make DESTDIR=$DRACOSRC_PKG ldconfig=/bin/true install || exit 1
+install -D -m644 sysctl.conf $DRACOSRC_PKG/etc/sysctl.conf || exit 1
+install -d $DRACOSRC_PKG/usr/include/proc || exit 1
+install -m644 proc/*.h $DRACOSRC_PKG/usr/include/proc || exit 1
+
+mkdir -p $DRACOSRC_PKG/lib $DRACOSRC_PKG/bin $DRACOSRC_PKG/sbin $DRACOSRC_PKG/usr/bin
+cat free > $DRACOSRC_PKG/bin/free || exit 1
+cat ps/ps> $DRACOSRC_PKG/bin/ps || exit 1
+cat proc/libproc-${DRACOSRC_PKG_VERSION}.so > $DRACOSRC_PKG/lib/libproc-${DRACOSRC_PKG_VERSION}.so || exit 1
+cat pkill > $DRACOSRC_PKG/usr/bin/pkill || exit 1
+cat skill > $DRACOSRC_PKG/usr/bin/skill || exit 1
+cat pmap > $DRACOSRC_PKG/usr/bin/pmap || exit 1
+cat slabtop > $DRACOSRC_PKG/usr/bin/slabtop || exit 1
+cat sysctl > $DRACOSRC_PKG/sbin/sysctl || exit 1
+cat tload > $DRACOSRC_PKG/usr/bin/tload || exit 1
+cat top > $DRACOSRC_PKG/usr/bin/top || exit 1
+cat uptime > $DRACOSRC_PKG/usr/bin/uptime || exit 1
+cat vmstat > $DRACOSRC_PKG/usr/bin/vmstat || exit 1
+cat w > $DRACOSRC_PKG/usr/bin/w || exit 1
+cat watch > $DRACOSRC_PKG/usr/bin/watch || exit 1
+
+( cd $DRACOSRC_PKG/usr/bin ;
+  ln -sf pkill pgrep
+  ln -sf skill snice
+  # Just in case
+  ln -sf /bin/free .
+  ln -sf /bin/ps .
+)
+
+chmod 755 $DRACOSRC_PKG/usr/bin/* $DRACOSRC_PKG/bin/* $DRACOSRC_PKG/sbin/*
+
+( cd $DRACOSRC_PKG ;
+  mv usr/share/man usr/
+  rm -r usr/share
+)

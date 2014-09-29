@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="kbd"
+DRACOSRC_PKG_VERSION="1.12"
+DRACOSRC_PKG_BUILD=6
+DRACOSRC_PKG_DESC="Keytable files and keyboard utilities"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr"

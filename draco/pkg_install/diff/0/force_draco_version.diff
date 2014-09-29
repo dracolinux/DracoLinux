@@ -1,0 +1,22 @@
+# Hardcode DracoLinux version 0.4 in pkg_add, remember to also use OS_VERSION=0.4 in mk.conf.
+# Why? Remove warning if kernel version differ, on Linux we (sadly) never stick to a version over time.
+--- add/perform.c.orig	2012-12-21 02:27:12.948595129 +0100
++++ add/perform.c	2012-12-21 02:27:44.473201018 +0100
+@@ -918,7 +918,7 @@
+ 		fatal = 0;
+ 
+ 	if (fatal ||
+-	    compatible_platform(OPSYS_NAME, host_uname.release,
++	    compatible_platform(OPSYS_NAME, "0.4",
+ 				pkg->buildinfo[BI_OS_VERSION]) != 1) {
+ 		warnx("Warning: package `%s' was built for a platform:",
+ 		    pkg->pkgname);
+@@ -928,7 +928,7 @@
+ 		    pkg->buildinfo[BI_OS_VERSION],
+ 		    OPSYS_NAME,
+ 		    effective_arch,
+-		    host_uname.release);
++		    "0.4");
+ 		if (!Force && fatal)
+ 			return -1;
+ 	}

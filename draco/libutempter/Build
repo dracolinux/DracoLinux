@@ -1,0 +1,4 @@
+DRACOSRC_PKG_NAME="libutempter"
+DRACOSRC_PKG_VERSION="1.1.5"
+DRACOSRC_PKG_BUILD=6
+DRACOSRC_PKG_DESC="utmp updating library and utillity"

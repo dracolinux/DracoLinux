@@ -1,0 +1,50 @@
+DRACOSRC_PKG_SHARED=$DRACOSRC_PKG_WORK/shared
+mkdir -p $DRACOSRC_PKG_SHARED/{lib,include} || exit 1
+
+# nbcompat
+(cd $DRACOSRC_PKG_WORK;
+  tar xfJ $DRACOSRC_CACHE/libnbcompat-$DRACOSRC_NBCOMPAT.tar.xz
+  cd libnbcompat-$DRACOSRC_NBCOMPAT
+  CFLAGS="$DRACOSRC_FLAGS" CXXFLAGS="$DRACOSRC_FLAGS" ./configure --prefix=$DRACOSRC_PKG_SHARED --enable-bsd-getopt --enable-db
+  bmake
+  bmake install
+)
+
+# libfetch
+(cd $DRACOSRC_PKG_WORK;
+  tar xfJ $DRACOSRC_CACHE/libfetch-$DRACOSRC_LIBFETCH.tar.xz
+  cd libfetch-$DRACOSRC_LIBFETCH
+  patch -p0 < $DRACOSRC_PKG_SRC_DIR/libfetch.diff
+  CFLAGS="$DRACOSRC_CFLAGS -I${DRACOSRC_PKG_SHARED}/include" LIBS="-L${DRACOSRC_PKG_SHARED}/lib" bmake
+  cp libfetch.a $DRACOSRC_PKG_SHARED/lib/ 
+  cp fetch.h $DRACOSRC_PKG_SHARED/include/
+  cp ftperr.h $DRACOSRC_PKG_SHARED/include/
+  cp httperr.h $DRACOSRC_PKG_SHARED/include/
+)
+
+mkdir -p $DRACOSRC_PKG/usr/sbin $DRACOSRC_PKG/usr/man/man{1,5,7,8} || exit 1
+export OPSYS=Linux 
+LDFLAGS="-L/usr/lib -L${DRACOSRC_PKG_SHARED}/lib" LIBS="-lssl -lcrypto -larchive -lfetch -lnbcompat" CPPFLAGS="$DRACOSRC_FLAGS -I/usr/include -I${DRACOSRC_PKG_SHARED}/include -D_LARGEFILE_SOURCE -D_LARGEFILES -D_FILE_OFFSET_BITS=64" ./configure --prefix=/usr --with-ssl || exit 1
+bmake || exit 1
+
+cp add/pkg_add $DRACOSRC_PKG/usr/sbin/ || exit 1
+cp admin/pkg_admin $DRACOSRC_PKG/usr/sbin/ || exit 1
+cp create/pkg_create $DRACOSRC_PKG/usr/sbin/ || exit 1
+cp delete/pkg_delete $DRACOSRC_PKG/usr/sbin/ || exit 1
+cp info/pkg_info $DRACOSRC_PKG/usr/sbin/ || exit 1
+cp admin/audit-packages $DRACOSRC_PKG/usr/sbin || exit 1
+cp admin/download-vulnerability-list $DRACOSRC_PKG/usr/sbin/ || exit 1
+
+cat add/pkg_add.1 > $DRACOSRC_PKG/usr/man/man1/pkg_add.1 || exit 1
+cat admin/pkg_admin.1 > $DRACOSRC_PKG/usr/man/man1/pkg_admin.1 || exit 1
+cat create/pkg_create.1 > $DRACOSRC_PKG/usr/man/man1/pkg_create.1 || exit 1
+cat delete/pkg_delete.1 > $DRACOSRC_PKG/usr/man/man1/pkg_delete.1 || exit 1
+cat info/pkg_info.1 > $DRACOSRC_PKG/usr/man/man1/pkg_info.1 || exit 1
+
+cat lib/pkg_install.conf.5 > $DRACOSRC_PKG/usr/man/man5/pkg_install.conf.5 || exit 1
+cat lib/pkg_summary.5 > $DRACOSRC_PKG/usr/man/man5/pkg_summary.5 || exit 1
+
+cat lib/pkgsrc.7 > $DRACOSRC_PKG/usr/man/man7/pkgsrc.7 || exit 1
+
+cat admin/audit-packages.8 > $DRACOSRC_PKG/usr/man/man8/audit-packages.8 || exit 1
+cat admin/download-vulnerability-list.8 > $DRACOSRC_PKG/usr/man/man8/download-vulnerability-list.8 || exit 1

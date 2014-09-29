@@ -1,0 +1,19 @@
+mkdir -p $DRACOSRC_PKG/bin || exit 1
+mv $DRACOSRC_PKG/usr/bin/tar $DRACOSRC_PKG/bin || exit 1
+
+( cd $DRACOSRC_PKG/usr/bin ; ln -sf /bin/tar . )
+( cd $DRACOSRC_PKG/bin ; ln -sf tar tar-$DRACOSRC_PKG_VERSION )
+
+mkdir -p $DRACOSRC_PKG/etc || exit 1
+
+( cd $DRACOSRC_PKG/etc ;
+  ln -sf ../usr/libexec/rmt rmt 
+)
+
+mkdir -p $DRACOSRC_PKG/sbin || exit 1
+
+( cd $DRACOSRC_PKG/sbin ;
+  ln -sf ../usr/libexec/rmt rmt
+)
+
+

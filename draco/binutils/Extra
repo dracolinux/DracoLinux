@@ -1,0 +1,6 @@
+(cd $DRACOSRC_PKG/usr/bin ; 
+  for i in *; do
+    ln -sf $i ${DRACOSRC_ARCH}-draco-linux-$i
+  done
+)
+(cd $DRACOSRC_PKG/usr/lib ; ln -sf libbfd-2.18.so libbfd.so)

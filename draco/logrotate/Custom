@@ -1,0 +1,13 @@
+make clean || exit 1
+CFLAGS="$DRACOSRC_FLAGS" CXXFLAGS="$DRACOSRC_FLAGS" make || exit 1
+strip logrotate
+mkdir -p $DRACOSRC_PKG/{usr/sbin,usr/man/man8,etc,etc/cron.daily,etc/logrotate.d,var/lib/logrotate} || exit 1
+
+cat logrotate > $DRACOSRC_PKG/usr/sbin/logrotate || exit 1
+chmod 755 $DRACOSRC_PKG/usr/sbin/logrotate
+
+cat $DRACOSRC_PKG_SRC_DIR/logrotate.conf > $DRACOSRC_PKG/etc/logrotate.conf.new || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/logrotate.cron > $DRACOSRC_PKG/etc/cron.daily/logrotate || exit 1
+chmod 755 $DRACOSRC_PKG/etc/cron.daily/logrotate
+
+cat logrotate.8 > $DRACOSRC_PKG/usr/man/man8/logrotate.8 || exit 1

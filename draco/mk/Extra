@@ -1,0 +1,7 @@
+cd $DRACOSRC_PKG_SRC_DIR/files || exit 1
+mkdir -p $DRACOSRC_PKG/usr/share/mk $DRACOSRC_PKG/usr/doc/$DRACOSRC_PKG_NAME-$DRACOSRC_PKG_VERSION || exit 1
+for i in *.mk; do
+  cat $i > $DRACOSRC_PKG/usr/share/mk/$i || exit 1
+done
+cat bsd.README > $DRACOSRC_PKG/usr/doc/$DRACOSRC_PKG_NAME-$DRACOSRC_PKG_VERSION/README || exit 1
+cd $DRACOSRC_PKG_WORK || exit 1

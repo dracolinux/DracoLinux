@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME=mpfr
+DRACOSRC_PKG_VERSION=3.1.1
+DRACOSRC_PKG_BUILD=8
+DRACOSRC_PKG_DESC="Multiple-Precision Floating-Point Reliable Library"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --infodir=/usr/info --enable-static=yes --enable-shared=yes $DRACOSRC_ARCH-draco-linux"

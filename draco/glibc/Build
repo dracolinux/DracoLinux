@@ -1,0 +1,9 @@
+DRACOSRC_PKG_NAME=glibc
+DRACOSRC_PKG_VERSION=2.11.3
+TZC=2012f
+TZD=2012f
+HEADERS=3.0.56
+DRACOSRC_FLAGS="-g -O3 -march=i486 -mtune=i686"
+DRACOSRC_PKG_BUILD=14
+DRACOSRC_PKG_DESC="GNU C Library"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --enable-kernel=2.6.32 --enable-add-ons=libidn,nptl --with-tls --with-__thread --without-cvs"

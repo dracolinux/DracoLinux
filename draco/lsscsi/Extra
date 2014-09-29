@@ -1,0 +1,6 @@
+
+( cd $DRACOSRC_PKG/usr ;
+  mv share/man .
+  rm -rf share
+)
+

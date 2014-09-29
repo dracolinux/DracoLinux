@@ -1,0 +1,54 @@
+
+HAVE_IP_TOOLS=1 HAVE_MII=1 make || exit 1
+HAVE_IP_TOOLS=1 HAVE_MII=1 make hostname || exit 1
+
+mkdir -p $DRACOSRC_PKG/{bin,sbin,usr/sbin} || exit 1
+
+strip --strip-unneeded ipmaddr iptunnel hostname arp ifconfig nameif rarp route netstat plipconfig slattach mii-tool
+
+cat arp > $DRACOSRC_PKG/sbin/arp || exit 1
+cat ifconfig > $DRACOSRC_PKG/sbin/ifconfig || exit 1
+cat rarp > $DRACOSRC_PKG/sbin/rarp || exit 1
+cat route > $DRACOSRC_PKG/sbin/route || exit 1
+cat hostname > $DRACOSRC_PKG/bin/hostname || exit 1
+cat mii-tool > $DRACOSRC_PKG/sbin/mii-tool || exit 1
+cat nameif > $DRACOSRC_PKG/sbin/nameif || exit 1
+cat netstat > $DRACOSRC_PKG/bin/netstat || exit 1
+cat plipconfig > $DRACOSRC_PKG/sbin/plipconfig || exit 1
+cat slattach > $DRACOSRC_PKG/usr/sbin/slattach || exit 1
+cat ipmaddr > $DRACOSRC_PKG/sbin/ipmaddr || exit 1
+cat iptunnel > $DRACOSRC_PKG/sbin/iptunnel || exit 1
+
+chmod 755 $DRACOSRC_PKG/sbin/* $DRACOSRC_PKG/bin/* $DRACOSRC_PKG/usr/sbin/*
+
+( cd man/en_US ;
+mkdir -p $DRACOSRC_PKG/usr/man/man{1,5,8}
+
+for page in dnsdomainname.1 domainname.1 hostname.1 nisdomainname.1 \
+  ypdomainname.1 ; do
+  cat $page > $DRACOSRC_PKG/usr/man/man1/$page
+done
+
+cat ethers.5 > $DRACOSRC_PKG/usr/man/man5/ethers.5
+
+for page in arp.8 ifconfig.8 mii-tool.8 nameif.8 netstat.8 rarp.8 route.8 \
+  slattach.8 plipconfig.8 ; do
+  cat $page > $DRACOSRC_PKG/usr/man/man8/$page
+done
+)
+
+( cd $DRACOSRC_PKG/bin
+  ln -sf hostname dnsdomainname
+  ln -sf hostname nisdomainname
+  ln -sf hostname ypdomainname
+)
+
+# This is a little Slackware-specific tool used in some of the network
+# related scripts to calculate network and broadcast addresses:
+( cd $DRACOSRC_PKG/bin
+  cc -O2 -o ipmask $DRACOSRC_PKG_SRC_DIR/ipmask.c || exit 1
+  strip --strip-unneeded ipmask
+  chmod 755 ipmask
+)
+cat $DRACOSRC_PKG_SRC_DIR/ipmask.8 > $DRACOSRC_PKG/usr/man/man8/ipmask.8 || exit 1
+

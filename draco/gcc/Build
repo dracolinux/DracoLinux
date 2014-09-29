@@ -1,0 +1,7 @@
+DRACOSRC_PKG_NAME=gcc
+DRACOSRC_PKG_VERSION=4.4.7
+DRACOSRC_PKG_BUILD=3
+DRACOSRC_NOSTRIP=1
+DRACOSRC_PKG_DESC="GNU Compiler Collection"
+DRACOSRC_PKG_TARGET=$DRACOSRC_ARCH-draco-linux
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --disable-libunwind-exceptions --disable-multilib --enable-shared --enable-languages=c,c++,fortran --enable-threads=posix --enable-__cxa_atexit --enable-checking=release --with-gnu-ld --verbose --with-arch=$DRACOSRC_ARCH --target=${DRACOSRC_PKG_TARGET} --host=${DRACOSRC_PKG_TARGET} --build=$DRACOSRC_PKG_TARGET"

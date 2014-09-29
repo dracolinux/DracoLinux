@@ -1,0 +1,125 @@
+#!/bin/sh
+COLLOCATION=.
+
+function gen_packages_txt {
+        echo '' > PACKAGES.TXT
+        echo "PACKAGES.TXT; `date`" >> PACKAGES.TXT
+        echo "" >> PACKAGES.TXT
+        echo "This file provides details on the packages found " >> PACKAGES.TXT
+        echo "in the ./ directory. " >> PACKAGES.TXT
+        echo "">> PACKAGES.TXT
+        find $COLLOCATION -type f -name '*.meta' ! -name '*x86_64*' -exec cat {} \; >> PACKAGES.TXT
+        #find $COLLOCATION/$SLVER -type f -name '*.meta' -exec cat {} \; >> PACKAGES.TXT
+        #find $COLLOCATION/ -name '*.*' -exec chown nobody {} \;
+        cat PACKAGES.TXT | gzip -c -9 > PACKAGES.TXT.gz
+}
+
+function gen_manifest_bz2 {
+        rm MANIFEST.bz2
+        find $COLLOCATION -type f -name '*.man' ! -name '*x86_64*' -exec cat {} \; >> MANIFEST
+        bzip2 MANIFEST
+        #find $COLLOCATION/ -name '*.*' -exec chown nobody {} \;
+}
+
+function gen_md5_checksums {
+        echo '' > CHECKSUMS.md5
+        echo "These are the MD5 message digests for the files in this directory." >> CHECKSUMS.md5
+        echo "If you want to test your files, use 'md5sum' and compare the values to" >> CHECKSUMS.md5
+        echo "the ones listed here." >> CHECKSUMS.md5
+        echo "" >> CHECKSUMS.md5
+        md5sum ./*.TXT >>CHECKSUMS.md5
+        md5sum ./MANIFEST.bz2 >>CHECKSUMS.md5
+        find . -type f -name '*.txz' -exec md5sum {} \; >> CHECKSUMS.md5
+        cat CHECKSUMS.md5 | gzip -c - > CHECKSUMS.md5.gz
+}
+
+function gen_files_txt {
+        echo '' > FILELIST.TXT
+        date >>FILELIST.TXT
+        echo "">>FILELIST.TXT
+        echo "Here is the file list for this directory.">>FILELIST.TXT
+        echo "">>FILELIST.TXT
+        ls -l *.md5 >>FILELIST.TXT
+        ls -l *.TXT >>FILELIST.TXT
+        ls -l *.bz2 >>FILELIST.TXT
+        find . -type f -name '*.txz' ! -name '*x86_64*' -exec ls -l {} \;>>FILELIST.TXT
+}
+
+function gen_meta {
+        if [ ! -f $1 ]; then
+                echo "File not found: $1"
+                exit 1;
+        fi
+            if [ "`echo $1|grep -E '(.*{1,})\-(.*[\.\-].*[\.\-].*).txz[ ]{0,}$'`" == "" ]; then
+            return;
+        fi
+        NAME=$(echo $1|sed -re "s/(.*\/)(.*.txz)$/\2/")
+        LOCATION=$(echo $1|sed -re "s/(.*)\/(.*.txz)$/\1/")
+        SIZE=$(xz -l $1|tail -1|awk '{print $3}')
+        USIZE=$(xz -l $1 |tail -1|awk '{print $5}')
+        REQUIRED=$(tar -O -xJf $1 install/slack-required 2>/dev/null|xargs -iZ echo -n "Z,"|sed -e "s/,$//")
+        SUGGEST=$(tar -O -xJf $1 install/slack-suggests 2>/dev/null|xargs -iZ echo -n "Z,"|sed -e "s/,$//")
+        METAFILE=$(echo $NAME|sed -re "s/\.txz$/\.meta/")
+        MANFILE=$(echo $NAME|sed -re "s/\.txz$/\.man/")
+        echo "PACKAGE NAME:  $NAME" > $COLLOCATION/$METAFILE
+        echo "PACKAGE LOCATION:  $LOCATION" >> $COLLOCATION/$METAFILE
+        echo "PACKAGE SIZE (compressed):  $SIZE K" >> $COLLOCATION/$METAFILE
+        echo "PACKAGE SIZE (uncompressed):  $USIZE K" >> $COLLOCATION/$METAFILE
+        echo "PACKAGE REQUIRED:  $REQUIRED" >> $COLLOCATION/$METAFILE
+        echo "PACKAGE SUGGESTS:  $SUGGEST" >> $COLLOCATION/$METAFILE
+        echo "PACKAGE DESCRIPTION:" >> $COLLOCATION/$METAFILE
+        tar -O -xJf $1 install/slack-desc|grep -E '\w+\:'|grep -v '^#' >> $COLLOCATION/$METAFILE
+        echo "" >> $COLLOCATION/$METAFILE
+        echo "++========================================" >> $COLLOCATION/$MANFILE
+	echo "||" >> $COLLOCATION/$MANFILE
+	echo "||   Package:  $LOCATION/$NAME" >> $COLLOCATION/$MANFILE
+        echo "||" >> $COLLOCATION/$MANFILE
+        echo "++========================================" >> $COLLOCATION/$MANFILE
+        tar tvfJ $1 >> $COLLOCATION/$MANFILE
+        echo "" >> $COLLOCATION/$MANFILE
+        echo "" >> $COLLOCATION/$MANFILE
+}
+
+
+case "$1" in
+        pkg)
+                if [ -n "$2" ]; then
+                        gen_meta $2
+                else
+                        echo "$0 [pkg [file]|all|PACKAGESTXT|MD5|FILESTXT|MANIFEST]"
+                fi
+        ;;
+        all)
+                for pkg in `find . -type f -name '*.txz' -print`
+                do
+                        gen_meta $pkg
+                done
+        ;;
+        new)
+                for pkg in `find . -type f -name '*.txz' -print`
+                do
+                        if [ ! -f "`echo $pkg|sed -re 's/\.tgz$/\.meta/'`" ]; then
+                                gen_meta $pkg
+                        fi
+                done
+        ;;
+        PACKAGESTXT)
+                gen_packages_txt
+        ;;
+        MD5)
+                gen_md5_checksums
+        ;;
+        FILESTXT)
+                gen_files_txt
+        ;;
+	MANIFEST)
+                gen_manifest_bz2
+        ;;
+        *)
+                echo "$0 [pkg [file]|all|PACKAGESTXT|MD5|FILESTXT|MANIFEST]"
+        ;;
+esac
+
+
+### end
+

@@ -1,0 +1,7 @@
+
+( cd $DRACOSRC_PKG/usr/bin ;
+  rm -f gmake
+  ln -sf make gmake
+)
+
+

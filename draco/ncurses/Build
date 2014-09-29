@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="ncurses"
+DRACOSRC_PKG_VERSION="5.6"
+DRACOSRC_PKG_BUILD=9
+DRACOSRC_PKG_DESC="A System V Release 4.0 curses emulation library"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --with-gpm --with-normal --with-shared --enable-symlinks --without-debug --without-profile --without-ada --program-suffix= --program-prefix="

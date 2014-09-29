@@ -1,0 +1,22 @@
+
+
+
+
+Welcome to the DracoLinux installation disk!
+
+- You will need one or more partitions of type 'Linux' prepared.  It is also
+  recommended that you create a swap partition (type 'Linux swap') prior
+  to installation:
+    cfdisk /dev/<partition>
+
+- If you're having problems that you think might be related to low memory (this
+  is possible on machines with 16 or less megabytes of system memory), you can
+  try activating a swap partition before you run setup.  After making a swap
+  partition (type 82) with cfdisk or fdisk, activate it like this: 
+    mkswap /dev/<partition> ; swapon /dev/<partition>
+
+- Once you have prepared the disk partitions for Linux, type 'setup' to begin
+  the installation process.  
+
+
+

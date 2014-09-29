@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="file"
+DRACOSRC_PKG_VERSION="4.21"
+DRACOSRC_PKG_BUILD=7
+DRACOSRC_PKG_DESC="A utility to determine file type"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --sysconfdir=/etc --datadir=/etc --enable-fsect-man5 --disable-static --build=$DRACOSRC_ARCH-draco-linux"

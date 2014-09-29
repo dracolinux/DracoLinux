@@ -1,0 +1,77 @@
+mkdir -p $DRACOSRC_PKG/lib
+mkdir -p $DRACOSRC_PKG/sbin
+mkdir -p $DRACOSRC_PKG/usr/bin
+mkdir -p $DRACOSRC_PKG/usr/lib
+mkdir -p $DRACOSRC_PKG/usr/sbin
+mkdir -p $DRACOSRC_PKG/usr/include
+mkdir -p $DRACOSRC_PKG/usr/doc
+mkdir -p $DRACOSRC_PKG/usr/man
+mkdir -p $DRACOSRC_PKG/usr/share
+mkdir -p $DRACOSRC_PKG/var/db/nscd
+mkdir -p $DRACOSRC_PKG/var/run/nscd
+
+( cd timezone
+  tar xvfJ ${DRACOSRC_CACHE}/tzdata${TZD}.tar.xz 
+  chown root:root *
+  mv yearistype.sh yearistype
+  chmod 644 *
+  chmod 755 yearistype
+  mkdir tzcode
+  cd tzcode
+  tar xvfJ ${DRACOSRC_CACHE}/tzcode${TZC}.tar.xz 
+  echo 'static char const TZVERSION[]="${TZC}";' > version.h
+  chown -R root:root .
+  chmod 644 *
+  cp -a *.c *.h ..
+)
+
+tar xJf $DRACOSRC_CACHE/linux-$HEADERS.tar.xz || exit 1
+( cd linux-$HEADERS ;
+  cat $DRACOSRC_DIR/common/linux30/config-generic > .config
+  make mrproper 
+  make headers_check
+  make INSTALL_HDR_PATH=$DRACOSRC_PKG/usr headers_install
+  rm -r $DRACOSRC_PKG/usr/include/drm $DRACOSRC_PKG/usr/include/scsi
+  cat include/linux/linkage.h > $DRACOSRC_PKG/usr/include/linux/linkage.h
+  cat include/linux/compiler.h > $DRACOSRC_PKG/usr/include/linux/compiler.h
+  cat include/asm-generic/linkage.h > $DRACOSRC_PKG/usr/include/asm-generic/linkage.h
+  cat include/asm-generic/page.h > $DRACOSRC_PKG/usr/include/asm-generic/page.h
+  cat include/asm-generic/memory_model.h > $DRACOSRC_PKG/usr/include/asm-generic/memory_model.h
+  cat include/asm-generic/getorder.h > $DRACOSRC_PKG/usr/include/asm-generic/getorder.h
+#  ( cd $DRACOSRC_PKG/usr/include/asm ; ln -sf ../asm-generic/page.h . )
+  find $DRACOSRC_PKG \( -name .install -o -name ..install.cmd \) -delete
+)
+
+mkdir build
+cd build || exit 1
+CFLAGS="${DRACOSRC_FLAGS}" CXXFLAGS="${DRACOSRC_FLAGS}" ../configure ${DRACOSRC_PKG_CONFIGURE} --with-headers=$DRACOSRC_PKG/usr/include $DRACOSRC_ARCH-draco-linux || exit 1
+make -j4 || exit 1
+make install install_root=$DRACOSRC_PKG || exit 1
+make localedata/install-locales install_root=$DRACOSRC_PKG || exit 1
+
+mkdir -p $DRACOSRC_PKG/etc
+cat ../nscd/nscd.conf > $DRACOSRC_PKG/etc/nscd.conf.new || exit 1
+
+mkdir -p $DRACOSRC_PKG/var/log/setup
+cp -a $DRACOSRC_PKG_SRC_DIR/timezone-scripts/setup.timeconfig $DRACOSRC_PKG/var/log/setup || exit 1
+chown root:root $DRACOSRC_PKG/var/log/setup/setup.timeconfig
+chmod 755 $DRACOSRC_PKG/var/log/setup/setup.timeconfig
+mkdir -p $DRACOSRC_PKG/usr/sbin
+cp -a $DRACOSRC_PKG_SRC_DIR/timezone-scripts/timeconfig $DRACOSRC_PKG/usr/sbin || exit 1
+chown root:root $DRACOSRC_PKG/usr/sbin/timeconfig
+chmod 755 $DRACOSRC_PKG/usr/sbin/timeconfig
+
+if [ ! -r $DRACOSRC_PKG/usr/share/zoneinfo/localtime ]; then
+  ( cd $DRACOSRC_PKG/usr/share/zoneinfo ; ln -sf /etc/localtime . )
+fi
+
+( cd $DRACOSRC_PKG/usr/lib ; strip -g *.a )
+
+( cd $DRACOSRC_PKG ; 
+  find . -name "*.orig" -exec rm {} \; 
+  find . -type l -exec rm {} \;
+)
+
+( cd $DRACOSRC_PKG/usr/include/asm ; ln -sf ../asm-generic/page.h . )
+( cd $DRACOSRC_PKG/usr/include/asm ; ln -sf ../asm-generic/linkage.h . )
+

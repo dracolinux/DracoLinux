@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="sdparm"
+DRACOSRC_PKG_VERSION="1.04"
+DRACOSRC_PKG_BUILD=5
+DRACOSRC_PKG_DESC="fetch and change SCSI attributes"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --bindir=/usr/sbin --sysconfdir=/etc --mandir=/usr/man --program-prefix= --program-suffix= "

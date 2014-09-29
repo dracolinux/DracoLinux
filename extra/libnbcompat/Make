@@ -1,0 +1,2 @@
+bmake || exit 1
+bmake DESTDIR=$DRACOSRC_PKG install || exit 1

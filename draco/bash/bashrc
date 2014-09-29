@@ -1,0 +1,4 @@
+#!/bin/sh
+if [ -r /etc/profile ]; then
+  . /etc/profile
+fi

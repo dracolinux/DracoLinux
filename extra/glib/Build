@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME=glib
+DRACOSRC_PKG_VERSION=2.28.6
+DRACOSRC_PKG_BUILD=1
+DRACOSRC_PKG_DESC="Library of C routines"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --sysconfdir=/etc --mandir=/usr/man --infodir=/usr/info"

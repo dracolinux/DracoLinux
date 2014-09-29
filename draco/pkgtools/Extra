@@ -1,0 +1,19 @@
+
+mkdir -p $DRACOSRC_PKG/bin $DRACOSRC_PKG/sbin $DRACOSRC_PKG/usr/man/man8
+
+cat $DRACOSRC_PKG_SRC_DIR/LICENSE > LICENSE.pkgtools
+cat src/tar > $DRACOSRC_PKG/bin/tar-1.13
+cat $DRACOSRC_DIR/common/pkgtools/explodepkg > $DRACOSRC_PKG/sbin/explodepkg || exit 1
+cat $DRACOSRC_DIR/common/pkgtools/installpkg > $DRACOSRC_PKG/sbin/installpkg || exit 1
+cat $DRACOSRC_DIR/common/pkgtools/makepkg > $DRACOSRC_PKG/sbin/makepkg || exit 1
+cat $DRACOSRC_DIR/common/pkgtools/removepkg > $DRACOSRC_PKG/sbin/removepkg || exit 1
+cat $DRACOSRC_DIR/common/pkgtools/upgradepkg > $DRACOSRC_PKG/sbin/upgradepkg || exit 1
+cat $DRACOSRC_DIR/common/pkgtools/explodepkg.8 > $DRACOSRC_PKG/usr/man/man8/explodepkg.8 || exit 1
+cat $DRACOSRC_DIR/common/pkgtools/installpkg.8 > $DRACOSRC_PKG/usr/man/man8/installpkg.8 || exit 1
+cat $DRACOSRC_DIR/common/pkgtools/makepkg.8 > $DRACOSRC_PKG/usr/man/man8/makepkg.8 || exit 1
+cat $DRACOSRC_DIR/common/pkgtools/removepkg.8 > $DRACOSRC_PKG/usr/man/man8/removepkg.8 || exit 1
+cat $DRACOSRC_DIR/common/pkgtools/upgradepkg.8 > $DRACOSRC_PKG/usr/man/man8/upgradepkg.8 || exit 1
+
+chmod 755 $DRACOSRC_PKG/bin/*
+chmod 755 $DRACOSRC_PKG/sbin/*
+chmod 644 $DRACOSRC_PKG/usr/man/man8/*

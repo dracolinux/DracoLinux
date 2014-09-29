@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="nvi"
+DRACOSRC_PKG_VERSION="1.81.6"
+DRACOSRC_PKG_BUILD=7
+DRACOSRC_PKG_DESC="The Berkeley VI Editor"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --sysconfdir=/etc --mandir=/usr/man --docdir=/usr/doc/nvi-$DRACOSRC_PKG_VERSION --enable-threads --enable-widechar --disable-static"

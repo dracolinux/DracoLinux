@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="less"
+DRACOSRC_PKG_VERSION="418"
+DRACOSRC_PKG_BUILD=7
+DRACOSRC_PKG_DESC="A terminal based program for viewing text files"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --sysconfdir=/etc"

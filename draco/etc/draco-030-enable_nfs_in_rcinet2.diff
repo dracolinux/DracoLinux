@@ -1,0 +1,58 @@
+--- rc.inet2.orig	2008-09-26 01:44:40.895248052 +0200
++++ rc.inet2	2008-09-26 01:45:16.987247637 +0200
+@@ -15,16 +15,33 @@
+ 
+ # At this point, we are ready to talk to The World...
+ 
++
+ # Mount remote (NFS) filesystems:
+ if cat /etc/fstab | grep -v '^#' | grep -w nfs 1> /dev/null 2> /dev/null ; then
+-  if [ -x /usr/local/sbin/portmap ]; then
+-    echo "Starting portmap: /usr/local/sbin/portmap"
+-    /usr/local/sbin/portmap
++  # Start rpc.portmap, /sbin/rpc.lockd, and /sbin/rpc.statd if we find NFS
++  # volumes defined in /etc/fstab since these will need to be running in order
++  # to mount them.  If they are not running, attempting to mount an NFS
++  # partition will cause mount to hang, or at least result in unreliable
++  # operation.  Keep this in mind if you plan to mount unlisted NFS
++  # partitions... 
++  # If you have uncommented NFS partitions in your /etc/fstab, rc.rpc is run
++  # whether it is set as executable or not.  If you don't want to run it,
++  # comment the NFS partitions out in /etc/fstab or erase/rename rc.rpc.
++  if [ -r /etc/rc.d/rc.rpc ]; then
++    sh /etc/rc.d/rc.rpc start
++  fi
+     echo "Mounting remote (NFS) file systems:  /sbin/mount -a -t nfs"
+     /sbin/mount -a -t nfs          # This may be our /usr runtime!
+     # Show the mounted volumes:
+     /sbin/mount -v -t nfs
+-  fi
++fi
++
++# If /etc/rc.d/rc.rpc is executable, run it to load rpc.portmap, rpc.lockd,
++# and rpc.statd.  This might be needed to mount NFS partitions that are not
++# listed in /etc/fstab.  Starting this twice won't hurt as the script will
++# check if things are already running before trying to start them.
++if [ -x /etc/rc.d/rc.rpc ]; then
++  sh /etc/rc.d/rc.rpc start
+ fi
+ 
+ # Mount remote (SMB) filesystems:
+@@ -54,3 +71,17 @@
+   . /etc/rc.d/rc.ip_forward start
+ fi
+ 
++# Start the inetd server:
++if [ -x /etc/rc.d/rc.inetd ]; then
++  /etc/rc.d/rc.inetd start
++fi
++
++# Start the NFS server.  Note that for this to work correctly, you'll
++# need nfsd support in the kernel (the startup script will try to load
++# the module for you).
++# You'll also need to set up some shares in /etc/exports.
++# Starting the NFS server:
++if [ -x /etc/rc.d/rc.nfsd ]; then
++  /etc/rc.d/rc.nfsd start
++fi
++

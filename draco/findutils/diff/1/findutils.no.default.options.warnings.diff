@@ -1,0 +1,25 @@
+--- ./find/find.c.orig	2006-04-01 04:38:20.000000000 -0600
++++ ./find/find.c	2007-03-08 00:37:35.000000000 -0600
+@@ -423,7 +423,9 @@
+   
+   if (isatty(0))
+     {
+-      options.warnings = true;
++      /* Feel free to turn these back on by default if you enjoy them... */
++      /* options.warnings = true; */
++      options.warnings = false;
+     }
+   else
+     {
+--- ./find/find.1.orig	2006-08-19 13:47:37.000000000 -0500
++++ ./find/find.1	2007-03-08 00:37:35.000000000 -0600
+@@ -219,8 +219,7 @@
+ command line usage, not to any conditions that 
+ .B find 
+ might encounter when it searches directories.  The default behaviour
+-corresponds to \-warn if standard input is a tty, and to \-nowarn
+-otherwise.
++corresponds to \-nowarn.
+ .IP \-xdev
+ Don't descend directories on other filesystems.
+ 

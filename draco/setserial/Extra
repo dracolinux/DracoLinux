@@ -1,0 +1,5 @@
+mkdir -p $DRACOSRC_PKG/usr/man/man8 || exit 1
+cat setserial.8 > $DRACOSRC_PKG/usr/man/man8/setserial.8 || exit 1
+mkdir -p $DRACOSRC_PKG/etc/rc.d || exit 1
+cat rc.serial > $DRACOSRC_PKG/etc/rc.d/rc.serial.new || exit 1
+cat serial.conf > $DRACOSRC_PKG/etc/serial.conf.new || exit 1

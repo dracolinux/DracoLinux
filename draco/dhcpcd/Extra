@@ -1,0 +1,6 @@
+
+( cd $DRACOSRC_PKG/etc/dhcpc;
+  mv dhcpcd.exe dhcpcd.exe-sample
+  chmod 755 dhcpcd.exe-sample
+)
+

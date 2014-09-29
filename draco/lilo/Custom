@@ -1,0 +1,22 @@
+make || exit 1
+make install ROOT=$DRACOSRC_PKG || exit 1
+
+rm -rf $DRACOSRC_PKG/etc || exit 1
+
+mv $DRACOSRC_PKG/usr/share/man $DRACOSRC_PKG/usr || exit 1
+rm -rf $DRACOSRC_PKG/usr/share || exit 1
+
+mkdir -p $DRACOSRC_PKG/sbin || exit 1
+
+cp -a $DRACOSRC_PKG_SRC_DIR/liloconfig $DRACOSRC_PKG/sbin/liloconfig || exit 1
+chmod 755 $DRACOSRC_PKG/sbin/liloconfig
+
+mkdir -p $DRACOSRC_PKG/var/log/setup || exit 1
+
+cp -a $DRACOSRC_PKG_SRC_DIR/setup.liloconfig $DRACOSRC_PKG/var/log/setup/setup.liloconfig || exit 1
+cp -a $DRACOSRC_PKG_SRC_DIR/text.lilohelp $DRACOSRC_PKG/var/log/setup/text.lilohelp || exit 1
+
+chmod 755 $DRACOSRC_PKG/var/log/setup/setup.liloconfig
+chmod 644 $DRACOSRC_PKG/var/log/setup/text.lilohelp
+
+chown root:root $DRACOSRC_PKG/var/log/setup/setup.liloconfig $DRACOSRC_PKG/var/log/setup/text.lilohelp

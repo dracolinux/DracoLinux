@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="diffutils"
+DRACOSRC_PKG_VERSION="2.8.1"
+DRACOSRC_PKG_BUILD=10
+DRACOSRC_PKG_DESC="Utility programs used for creating patch files"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr"

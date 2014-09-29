@@ -1,0 +1,13 @@
+#! /bin/sh
+#
+# rc.inet1	This shell script boots up the base INET system.
+#
+# Version:	@(#)/etc/rc.d/rc.inet1	1.01	05/27/93
+#
+
+HOSTNAME=`cat /etc/HOSTNAME`
+/bin/hostname `cat /etc/HOSTNAME | cut -f1 -d .`
+
+# Attach the loopback device.
+/sbin/ifconfig lo 127.0.0.1
+/sbin/route add -net 127.0.0.0 netmask 255.0.0.0 lo

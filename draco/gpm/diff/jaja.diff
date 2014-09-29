@@ -1,0 +1,29 @@
+--- src/client.c.orig	2012-10-07 18:35:40.909777711 +0200
++++ src/client.c	2012-10-07 18:38:13.200651550 +0200
+@@ -148,7 +148,7 @@
+       goto err;
+    }
+ 
+-#ifndef SO_PEERCRED
++/*#ifndef SO_PEERCRED*/
+    if (stat(addr.sun_path, &statbuf) == -1 || !S_ISSOCK(statbuf.st_mode)) {
+       gpm_report(GPM_PR_ERR,GPM_MESS_ADDRES_NSOCKET,addr.sun_path);
+       goto err;
+@@ -165,7 +165,7 @@
+    }
+ 
+    uid = statbuf.st_uid;      /* owner of socket */
+-#else
++/*#else
+    {
+       struct ucred sucred;
+       socklen_t credlen = sizeof(struct ucred);
+@@ -177,7 +177,7 @@
+       uid = sucred.uid;
+       gpm_report(GPM_PR_DEBUG,GPM_MESS_PEER_SCK_UID, uid);
+    }
+-#endif
++#endif*/
+ 
+    if (uid != 0 && !is_console_owner(request->vc, uid)) {
+       gpm_report(GPM_PR_WARN, GPM_MESS_FAILED_CONNECT, uid, request->vc);

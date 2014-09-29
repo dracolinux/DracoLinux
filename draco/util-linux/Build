@@ -1,0 +1,6 @@
+DRACOSRC_PKG_NAME="util-linux"
+DRACOSRC_PKG_ALT_NAME=$DRACOSRC_PKG_NAME-ng-
+DRACOSRC_PKG_VERSION="2.15.1"
+DRACOSRC_PKG_BUILD=4
+DRACOSRC_PKG_DESC="Miscellaneous system utilities for Linux"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --enable-arch --enable-write --enable-raw --disable-wall --enable-rdev --disable-kill"

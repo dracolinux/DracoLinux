@@ -1,0 +1,21 @@
+mkdir -p $DRACOSRC_PKG/etc || exit 1
+mkdir -p $DRACOSRC_PKG/var/log || exit 1
+mkdir -p $DRACOSRC_PKG/sbin || exit 1
+
+touch $DRACOSRC_PKG/var/log/faillog.new || exit 1
+
+cat etc/login.defs.linux > $DRACOSRC_PKG/etc/login.defs.new || exit 1
+cat etc/login.access > $DRACOSRC_PKG/etc/login.access.new || exit 1
+
+cat $DRACOSRC_PKG_SRC_DIR/adduser > $DRACOSRC_PKG/usr/sbin/adduser || exit 1
+cat src/sulogin > $DRACOSRC_PKG/sbin/sulogin || exit 1
+cat debian/shadowconfig.sh > $DRACOSRC_PKG/usr/sbin/shadowconfig || exit 1
+
+chmod 755 $DRACOSRC_PKG/usr/sbin/{adduser,shadowconfig}
+chmod 755 $DRACOSRC_PKG/sbin/sulogin
+
+( cd $DRACOSRC_PKG; 
+  rm -f bin/vipw 
+  ( cd usr/sbin; ln -sf vipw vigr)
+  mv bin/sg usr/bin/
+)

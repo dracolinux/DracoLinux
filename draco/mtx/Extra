@@ -1,0 +1,6 @@
+
+( cd $DRACOSRC_PKG ;
+  mkdir usr 
+  mv sbin man usr/
+)
+

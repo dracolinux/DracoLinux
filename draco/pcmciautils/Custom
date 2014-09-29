@@ -1,0 +1,20 @@
+
+make || exit 1
+make install DESTDIR=$DRACOSRC_PKG
+
+rm -rf $DRACOSRC_PKG/etc/*
+mkdir -p $DRACOSRC_PKG/etc/pcmcia $DRACOSRC_PKG/etc/rc.d $DRACOSRC_PKG/lib/udev/rules.d
+
+cat $DRACOSRC_PKG_SRC_DIR/rc.pcmcia > $DRACOSRC_PKG/etc/rc.d/rc.pcmcia.new || exit 1
+chmod 755 $DRACOSRC_PKG/etc/rc.d/rc.pcmcia.new
+
+cat $DRACOSRC_PKG_SRC_DIR/config.opts > $DRACOSRC_PKG/etc/pcmcia/config.opts.new || exit 1
+chmod 644 $DRACOSRC_PKG/etc/pcmcia/config.opts.new
+
+cat $DRACOSRC_PKG_SRC_DIR/60-pcmcia.rules > $DRACOSRC_PKG/lib/udev/rules.d/60-pcmcia.rules || exit 1
+chmod 644 $DRACOSRC_PKG/lib/udev/rules.d/60-pcmcia.rules
+
+( cd $DRACOSRC_PKG/usr ;
+  mv share/man .
+  rm -rf share
+)

@@ -1,0 +1,6 @@
+
+cd $DRACOSRC_PKG_NAME
+make || exit 1
+mkdir -p $DRACOSRC_PKG/sbin
+cp -a mksquashfs unsquashfs $DRACOSRC_PKG/sbin/
+

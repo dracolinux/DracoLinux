@@ -1,0 +1,2 @@
+make || exit 1
+make install docdir=/usr/doc/rp-pppoe-$DRACOSRC_PKG_VERSION DESTDIR=$DRACOSRC_PKG install || exit 1

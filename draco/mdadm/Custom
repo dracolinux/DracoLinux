@@ -1,0 +1,9 @@
+
+make || exit 1
+make install DESTDIR=$DRACOSRC_PKG || exit 1
+( cd $DRACOSRC_PKG/usr ;
+  mv share/man .
+  rm -rf share
+)
+mkdir -p $DRACOSRC_PKG/etc
+cat mdadm.conf-example > $DRACOSRC_PKG/etc/mdadm.conf.new

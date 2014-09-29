@@ -1,0 +1,4 @@
+
+make install-man DESTDIR=$DRACOSRC_PKG || exit 1
+
+

@@ -1,0 +1,2 @@
+make -j4 || exit 1
+make prefix=$DRACOSRC_PKG/usr install || exit 1

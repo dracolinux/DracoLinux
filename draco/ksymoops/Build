@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="ksymoops"
+DRACOSRC_PKG_VERSION="2.4.11"
+DRACOSRC_PKG_BUILD=9
+DRACOSRC_PKG_DESC="A Linux kernel Oops file troubleshooting tool"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr"

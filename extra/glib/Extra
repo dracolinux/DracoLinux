@@ -1,0 +1,5 @@
+rm -r $DRACOSRC_PKG/usr/share/gtk-doc || exit 1
+mkdir -p $DRACOSRC_PKG/etc/profile.d/ || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/libglib2.sh > $DRACOSRC_PKG/etc/profile.d/libglib2.sh.new || exit 1
+chown root:root $DRACOSRC_PKG/etc/profile.d/*
+chmod 755 $DRACOSRC_PKG/etc/profile.d/*

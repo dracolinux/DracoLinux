@@ -1,0 +1,4 @@
+
+make || exit 1
+make PREFIX=$DRACOSRC_PKG install
+

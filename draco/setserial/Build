@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="setserial"
+DRACOSRC_PKG_VERSION="2.17"
+DRACOSRC_PKG_BUILD=6
+DRACOSRC_PKG_DESC="Get/Set Linux serial port information"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr"

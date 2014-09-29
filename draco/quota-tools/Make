@@ -1,0 +1,5 @@
+
+make || exit 1
+make ROOTDIR=$DRACOSRC_PKG install || exit 1
+
+

@@ -1,0 +1,9 @@
+CFLAGS="$DRACOSRC_CFLAGS" ./configure || exit 1
+CFLAGS="$DRACOSRC_CFLAGS" make || exit 1
+make install DESTDIR=$DRACOSRC_PKG || exit 1
+for file in $DRACOSRC_PKG/etc/iproute2/* ; do
+  mv $file ${file}.new
+done
+
+mkdir -p $DRACOSRC_PKG/var/lib/arpd || exit 1
+rm -rf $DRACOSRC_PKG/usr/doc/$DRACOSRC_PKG_NAME

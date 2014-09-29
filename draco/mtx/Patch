@@ -1,0 +1,2 @@
+
+sed -i 's/static const unsigned char scsi_command_size/const unsigned char scsi_command_size/' sg_err.c || exit 1

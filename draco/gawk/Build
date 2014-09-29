@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="gawk"
+DRACOSRC_PKG_VERSION="3.1.5"
+DRACOSRC_PKG_BUILD=9
+DRACOSRC_PKG_DESC="pattern scanning and processing language"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr"

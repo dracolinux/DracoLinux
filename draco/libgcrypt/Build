@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="libgcrypt"
+DRACOSRC_PKG_VERSION="1.4.4"
+DRACOSRC_PKG_BUILD=6
+DRACOSRC_PKG_DESC="GNU cryptographic library"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --infodir=/usr/info $DRACOSRC_ARCH-draco-linux"

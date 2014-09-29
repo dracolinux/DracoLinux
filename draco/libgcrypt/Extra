@@ -1,0 +1,3 @@
+
+( cd $DRACOSRC_PKG ; rm -rf usr/sbin )
+

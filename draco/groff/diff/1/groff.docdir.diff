@@ -1,0 +1,11 @@
+--- ./Makefile.in.orig	2004-04-07 08:33:39.000000000 -0700
++++ ./Makefile.in	2005-06-16 11:29:46.000000000 -0700
+@@ -114,7 +114,7 @@
+ infodir=@infodir@
+ 
+ # `docdir' says where to install documentation files.
+-docdir=$(datadir)/doc/groff/$(version)$(revision)
++docdir=$(prefix)/doc/groff-$(version)$(revision)
+ 
+ # `exampledir' says where to install example files.
+ exampledir=$(docdir)/examples

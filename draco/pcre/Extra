@@ -1,0 +1,1 @@
+rm -rf $DRACOSRC_PKG/usr/share || exit 1

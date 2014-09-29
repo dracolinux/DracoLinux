@@ -1,0 +1,92 @@
+# devo dialogrc stanard scheme
+#	for general use - other schemes may be more appropriate for some uses.
+
+
+#	IMHO, color is good if used carefully. but, shadow is too much,
+#	the built-in border is enough trim and adds useful effect;
+#
+use_colors = ON
+use_shadow = OFF
+
+# basic color scheme
+# color = ( foreground, background, foreground_bright )
+#
+#	screen_color:	black background
+#			does foreground + highlite affect -anything- ? 
+#			i don't think so ...
+#	dialog_color:	low intensity white panel with black text;
+#			might use different dialog_color for special purpose,
+#			eg, use (RED,WHITE,ON) for 'error' messages
+#	title_color:	should generally match dialog_color
+#			might use different title_color for special purpose,
+#			eg, use (RED,WHITE,ON) for 'error' messages
+#	border_color:	(foreground,background) should match dialog_color
+#			background, with foreground bright.  nothing else
+#			seems to make sense.
+#
+screen_color = (WHITE,WHITE,ON)
+dialog_color = (WHITE,RED,OFF)
+title_color = (WHITE,RED,OFF)
+border_color = (RED,RED,ON)
+
+# inactive buttons should fade into background, so
+#	- backgound should match dialog_color( background )
+#	- foreground should fade into background color
+#		bright WHITE gives a grey foreground character
+#
+button_inactive_color = (WHITE,RED,ON)
+button_key_inactive_color = (WHITE,RED,ON)
+button_label_inactive_color = (WHITE,RED,ON)
+
+# active button needs to stand out - good place to use color
+#
+button_active_color = (WHITE,WHITE,ON)
+button_key_active_color = (WHITE,WHITE,ON)
+button_label_active_color = (WHITE,WHITE,ON)
+
+# menubox should look just like dialog box, KISS, so:
+#	menubox_color should match dialog_color
+#	menubox_border_color should match border_color 
+#
+menubox_color = (WHITE,RED,OFF)
+menubox_border_color = (RED,RED,ON)
+
+# tags and items should match menubox_color 
+#i tag_key should stand out ( slightly )
+#		WHITE looks good on my system ... but,
+#		WHITE, WHITE, GREEN might all be good too ...
+#
+tag_color = (WHITE,RED,OFF)
+tag_key_color = (WHITE,RED,OFF)
+item_color = (WHITE,RED,OFF)
+
+# selected tag needs to stand out ( but key doesn't )
+#
+tag_selected_color = (WHITE,WHITE,ON)
+tag_key_selected_color = (WHITE,WHITE,ON)
+item_selected_color = (WHITE,WHITE,ON)
+
+
+
+
+inputbox_color = (WHITE,RED,OFF)
+inputbox_border_color = (RED,RED,ON)
+
+searchbox_color = ( WHITE,RED,ON)
+searchbox_title_color = (WHITE,RED,ON)
+searchbox_border_color = (WHITE,RED,OFF)
+
+position_indicator_color = (WHITE,RED,OFF)
+
+check_color = (WHITE,RED,OFF)
+check_selected_color = (RED,RED,ON)
+
+uarrow_color = (GREEN,RED,ON)
+darrow_color = (GREEN,RED,ON)
+
+itemhelp_color = (RED,WHITE,OFF)
+
+form_text_color = (RED,WHITE,ON)
+form_active_text_color = (WHITE,RED,OFF)
+
+# the end.

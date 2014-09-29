@@ -1,0 +1,8 @@
+DRACOSRC_PKG_NAME="acl"
+DRACOSRC_PKG_ALT_NAME="acl_"
+DRACOSRC_PKG_VERSION="2.2.47"
+DRACOSRC_PKG_ALT_VERSION="2.2.47-1"
+DRACOSRC_PKG_ALT_PKG_SRC=${DRACOSRC_PKG_NAME}-${DRACOSRC_PKG_VERSION}
+DRACOSRC_PKG_BUILD=7
+DRACOSRC_PKG_DESC="tools for using POSIX Access Control Lists"
+DRACOSRC_PKG_CONFIGURE="--prefix=/ --exec-prefix=/ --sbindir=/bin --bindir=/usr/bin --libdir=/lib --libexecdir=/usr/lib --includedir=/usr/include --mandir=/usr/man --datadir=/usr/share"

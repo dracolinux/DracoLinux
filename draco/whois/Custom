@@ -1,0 +1,19 @@
+
+make || exit 1
+mkdir -p $DRACOSRC_PKG/usr/bin
+cat whois > $DRACOSRC_PKG/usr/bin/whois || exit 1
+chmod 755 $DRACOSRC_PKG/usr/bin/whois || exit 1
+
+( cd po
+  make
+  for n in *.mo ; do \
+    l=`basename $n .mo`; \
+    /usr/bin/install -c -m 755 -d $DRACOSRC_PKG/usr/share/locale/$l; \
+    /usr/bin/install -c -m 755 -d $DRACOSRC_PKG/usr/share/locale/$l/LC_MESSAGES; \
+    /usr/bin/install -c -m 644 $n $DRACOSRC_PKG/usr/share/locale/$l/LC_MESSAGES/whois.mo; \
+  done
+)
+
+mkdir -p $DRACOSRC_PKG/usr/man/man1
+cat whois.1 > $DRACOSRC_PKG/usr/man/man1/whois.1 || exit 1
+

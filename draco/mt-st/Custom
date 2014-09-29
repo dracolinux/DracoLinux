@@ -1,0 +1,15 @@
+
+make || exit 1
+strip mt stinit
+
+mkdir -p $DRACOSRC_PKG/{bin,sbin,usr/man/man1,usr/man/man8} || exit 1
+
+cat mt > $DRACOSRC_PKG/bin/mt || exit 1
+cat stinit > $DRACOSRC_PKG/sbin/stinit || exit 1
+cat mt.1 > $DRACOSRC_PKG/usr/man/man1/mt.1 || exit 1
+cat stinit.8 > $DRACOSRC_PKG/usr/man/man8/stinit.8 || exit 1
+
+chmod 755 $DRACOSRC_PKG/bin/mt $DRACOSRC_PKG/sbin/stinit  || exit 1
+
+
+
