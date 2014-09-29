@@ -1,0 +1,675 @@
+--- mt-st-0.9b.orig/Makefile
++++ mt-st-0.9b/Makefile
+@@ -8,7 +8,7 @@
+ mt:	mt.c
+ 	$(CC) $(CFLAGS) -o mt mt.c
+ 
+-stinit:	stinit.c
++stinit:	stinit.c kernel/sg.h
+ 	$(CC) $(CFLAGS) -o stinit stinit.c
+ 
+ install: mt stinit
+--- mt-st-0.9b.orig/mt.c
++++ mt-st-0.9b/mt.c
+@@ -216,6 +216,7 @@
+     {0x40, "DLT1 40 GB, or Ultrium"},
+     {0x41, "DLT 40GB, or Ultrium2"},
+     {0x42, "LTO-2"},
++    {0x44, "LTO-3"},
+     {0x45, "QIC-3095-MC (TR-4)"},
+     {0x47, "TR-5"},
+     {0x80, "DLT 15GB uncomp. or Ecrix"},
+--- mt-st-0.9b.orig/mtio.h
++++ mt-st-0.9b/mtio.h
+@@ -10,7 +10,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/ioctl.h>
+-#include <linux/qic117.h>
++#include "qic117.h"
+ 
+ /*
+  * Structures and definitions for mag tape io control commands
+--- mt-st-0.9b.orig/stinit.c
++++ mt-st-0.9b/stinit.c
+@@ -20,7 +20,8 @@
+ #include <sys/ioctl.h>
+ #include <sys/sysmacros.h>
+ #include <linux/major.h>
+-#include <scsi/sg.h>
++
++#include "kernel/sg.h"
+ 
+ #include "mtio.h"
+ 
+@@ -521,10 +522,10 @@
+ 	}
+ 	if (result) {
+ 	    close(fn);
+-	    sprintf(buffer,
++	    sprintf((char *)buffer,
+ 		    "The SCSI INQUIRY for device '%s' failed (power off?)",
+ 		    tname);
+-	    perror(buffer);
++	    perror((char *)buffer);
+ 	    return FALSE;
+ 	}
+     }
+@@ -570,7 +571,7 @@
+ 	return dev;
+     }
+     else { /* Search from the device directories */
+-	for (dvd=devdirs; dvd->dir != NULL; dvd++) {
++	for (dvd=devdirs; *(dvd->dir); dvd++) {
+ 	    dn = dvd->dir;
+ 	    if ((dirp = opendir(dn)) == NULL)
+ 	      continue;
+--- mt-st-0.9b.orig/kernel/sg.h
++++ mt-st-0.9b/kernel/sg.h
+@@ -0,0 +1,201 @@
++#define __user
++
++/*
++   This is a partial copy of a header from the linux kernel source tree,
++   include/scsi/sg.h. It has been copied hither by Jan Christoph
++   Nordholz <hesso@pool.math.tu-berlin.de> to simplify the build process
++   of the mt-st package. The original file's copyright notice follows.
++
++   -- Jan Christoph Nordholz, 2006/07/09
++
++   History:
++    Started: Aug 9 by Lawrence Foard (entropy@world.std.com), to allow user
++     process control of SCSI devices.
++    Development Sponsored by Killy Corp. NY NY
++Original driver (sg.h):
++*       Copyright (C) 1992 Lawrence Foard
++Version 2 and 3 extensions to driver:
++*       Copyright (C) 1998 - 2003 Douglas Gilbert
++
++    Version: 3.5.29 (20030529)
++    This version is for 2.5 series kernels.
++
++    For a full changelog see http://www.torque.net/sg
++
++*/
++
++/* New interface introduced in the 3.x SG drivers follows */
++
++typedef struct sg_iovec /* same structure as used by readv() Linux system */
++{                       /* call. It defines one scatter-gather element. */
++    void __user *iov_base;      /* Starting address  */
++    size_t iov_len;             /* Length in bytes  */
++} sg_iovec_t;
++
++
++typedef struct sg_io_hdr
++{
++    int interface_id;           /* [i] 'S' for SCSI generic (required) */
++    int dxfer_direction;        /* [i] data transfer direction  */
++    unsigned char cmd_len;      /* [i] SCSI command length ( <= 16 bytes) */
++    unsigned char mx_sb_len;    /* [i] max length to write to sbp */
++    unsigned short iovec_count; /* [i] 0 implies no scatter gather */
++    unsigned int dxfer_len;     /* [i] byte count of data transfer */
++    void __user *dxferp;	/* [i], [*io] points to data transfer memory
++					      or scatter gather list */
++    unsigned char __user *cmdp; /* [i], [*i] points to command to perform */
++    void __user *sbp;		/* [i], [*o] points to sense_buffer memory */
++    unsigned int timeout;       /* [i] MAX_UINT->no timeout (unit: millisec) */
++    unsigned int flags;         /* [i] 0 -> default, see SG_FLAG... */
++    int pack_id;                /* [i->o] unused internally (normally) */
++    void __user * usr_ptr;      /* [i->o] unused internally */
++    unsigned char status;       /* [o] scsi status */
++    unsigned char masked_status;/* [o] shifted, masked scsi status */
++    unsigned char msg_status;   /* [o] messaging level data (optional) */
++    unsigned char sb_len_wr;    /* [o] byte count actually written to sbp */
++    unsigned short host_status; /* [o] errors from host adapter */
++    unsigned short driver_status;/* [o] errors from software driver */
++    int resid;                  /* [o] dxfer_len - actual_transferred */
++    unsigned int duration;      /* [o] time taken by cmd (unit: millisec) */
++    unsigned int info;          /* [o] auxiliary information */
++} sg_io_hdr_t;  /* 64 bytes long (on i386) */
++
++#define SG_INTERFACE_ID_ORIG 'S'
++
++/* Use negative values to flag difference from original sg_header structure */
++#define SG_DXFER_NONE (-1)      /* e.g. a SCSI Test Unit Ready command */
++#define SG_DXFER_TO_DEV (-2)    /* e.g. a SCSI WRITE command */
++#define SG_DXFER_FROM_DEV (-3)  /* e.g. a SCSI READ command */
++#define SG_DXFER_TO_FROM_DEV (-4) /* treated like SG_DXFER_FROM_DEV with the
++				   additional property than during indirect
++				   IO the user buffer is copied into the
++				   kernel buffers before the transfer */
++#define SG_DXFER_UNKNOWN (-5)   /* Unknown data direction */
++
++/* following flag values can be "or"-ed together */
++#define SG_FLAG_DIRECT_IO 1     /* default is indirect IO */
++#define SG_FLAG_UNUSED_LUN_INHIBIT 2   /* default is overwrite lun in SCSI */
++				/* command block (when <= SCSI_2) */
++#define SG_FLAG_MMAP_IO 4       /* request memory mapped IO */
++#define SG_FLAG_NO_DXFER 0x10000 /* no transfer of kernel buffers to/from */
++				/* user space (debug indirect IO) */
++
++/* following 'info' values are "or"-ed together */
++#define SG_INFO_OK_MASK 0x1
++#define SG_INFO_OK 0x0          /* no sense, host nor driver "noise" */
++#define SG_INFO_CHECK 0x1       /* something abnormal happened */
++
++#define SG_INFO_DIRECT_IO_MASK 0x6
++#define SG_INFO_INDIRECT_IO 0x0 /* data xfer via kernel buffers (or no xfer) */
++#define SG_INFO_DIRECT_IO 0x2   /* direct IO requested and performed */
++#define SG_INFO_MIXED_IO 0x4    /* part direct, part indirect IO */
++
++
++typedef struct sg_scsi_id { /* used by SG_GET_SCSI_ID ioctl() */
++    int host_no;        /* as in "scsi<n>" where 'n' is one of 0, 1, 2 etc */
++    int channel;
++    int scsi_id;        /* scsi id of target device */
++    int lun;
++    int scsi_type;      /* TYPE_... defined in scsi/scsi.h */
++    short h_cmd_per_lun;/* host (adapter) maximum commands per lun */
++    short d_queue_depth;/* device (or adapter) maximum queue length */
++    int unused[2];      /* probably find a good use, set 0 for now */
++} sg_scsi_id_t; /* 32 bytes long on i386 */
++
++typedef struct sg_req_info { /* used by SG_GET_REQUEST_TABLE ioctl() */
++    char req_state;     /* 0 -> not used, 1 -> written, 2 -> ready to read */
++    char orphan;        /* 0 -> normal request, 1 -> from interruped SG_IO */
++    char sg_io_owned;   /* 0 -> complete with read(), 1 -> owned by SG_IO */
++    char problem;       /* 0 -> no problem detected, 1 -> error to report */
++    int pack_id;        /* pack_id associated with request */
++    void __user *usr_ptr;     /* user provided pointer (in new interface) */
++    unsigned int duration; /* millisecs elapsed since written (req_state==1)
++			      or request duration (req_state==2) */
++    int unused;
++} sg_req_info_t; /* 20 bytes long on i386 */
++
++
++/* IOCTLs: Those ioctls that are relevant to the SG 3.x drivers follow.
++ [Those that only apply to the SG 2.x drivers are at the end of the file.]
++ (_GET_s yield result via 'int *' 3rd argument unless otherwise indicated) */
++
++#define SG_EMULATED_HOST 0x2203 /* true for emulated host adapter (ATAPI) */
++
++/* Used to configure SCSI command transformation layer for ATAPI devices */
++/* Only supported by the ide-scsi driver */
++#define SG_SET_TRANSFORM 0x2204 /* N.B. 3rd arg is not pointer but value: */
++		      /* 3rd arg = 0 to disable transform, 1 to enable it */
++#define SG_GET_TRANSFORM 0x2205
++
++#define SG_SET_RESERVED_SIZE 0x2275  /* request a new reserved buffer size */
++#define SG_GET_RESERVED_SIZE 0x2272  /* actual size of reserved buffer */
++
++/* The following ioctl has a 'sg_scsi_id_t *' object as its 3rd argument. */
++#define SG_GET_SCSI_ID 0x2276   /* Yields fd's bus, chan, dev, lun + type */
++/* SCSI id information can also be obtained from SCSI_IOCTL_GET_IDLUN */
++
++/* Override host setting and always DMA using low memory ( <16MB on i386) */
++#define SG_SET_FORCE_LOW_DMA 0x2279  /* 0-> use adapter setting, 1-> force */
++#define SG_GET_LOW_DMA 0x227a   /* 0-> use all ram for dma; 1-> low dma ram */
++
++/* When SG_SET_FORCE_PACK_ID set to 1, pack_id is input to read() which
++   tries to fetch a packet with a matching pack_id, waits, or returns EAGAIN.
++   If pack_id is -1 then read oldest waiting. When ...FORCE_PACK_ID set to 0
++   then pack_id ignored by read() and oldest readable fetched. */
++#define SG_SET_FORCE_PACK_ID 0x227b
++#define SG_GET_PACK_ID 0x227c /* Yields oldest readable pack_id (or -1) */
++
++#define SG_GET_NUM_WAITING 0x227d /* Number of commands awaiting read() */
++
++/* Yields max scatter gather tablesize allowed by current host adapter */
++#define SG_GET_SG_TABLESIZE 0x227F  /* 0 implies can't do scatter gather */
++
++#define SG_GET_VERSION_NUM 0x2282 /* Example: version 2.1.34 yields 20134 */
++
++/* Returns -EBUSY if occupied. 3rd argument pointer to int (see next) */
++#define SG_SCSI_RESET 0x2284
++/* Associated values that can be given to SG_SCSI_RESET follow */
++#define		SG_SCSI_RESET_NOTHING	0
++#define		SG_SCSI_RESET_DEVICE	1
++#define		SG_SCSI_RESET_BUS	2
++#define		SG_SCSI_RESET_HOST	3
++
++/* synchronous SCSI command ioctl, (only in version 3 interface) */
++#define SG_IO 0x2285   /* similar effect as write() followed by read() */
++
++#define SG_GET_REQUEST_TABLE 0x2286   /* yields table of active requests */
++
++/* How to treat EINTR during SG_IO ioctl(), only in SG 3.x series */
++#define SG_SET_KEEP_ORPHAN 0x2287 /* 1 -> hold for read(), 0 -> drop (def) */
++#define SG_GET_KEEP_ORPHAN 0x2288
++
++/* yields scsi midlevel's access_count for this SCSI device */
++#define SG_GET_ACCESS_COUNT 0x2289  
++
++
++#define SG_SCATTER_SZ (8 * 4096)  /* PAGE_SIZE not available to user */
++/* Largest size (in bytes) a single scatter-gather list element can have.
++   The value must be a power of 2 and <= (PAGE_SIZE * 32) [131072 bytes on
++   i386]. The minimum value is PAGE_SIZE. If scatter-gather not supported
++   by adapter then this value is the largest data block that can be
++   read/written by a single scsi command. The user can find the value of
++   PAGE_SIZE by calling getpagesize() defined in unistd.h . */
++
++#define SG_DEFAULT_RETRIES 0
++
++/* Defaults, commented if they differ from original sg driver */
++#define SG_DEF_FORCE_LOW_DMA 0  /* was 1 -> memory below 16MB on i386 */
++#define SG_DEF_FORCE_PACK_ID 0
++#define SG_DEF_KEEP_ORPHAN 0
++#define SG_DEF_RESERVED_SIZE SG_SCATTER_SZ /* load time option */
++
++/* maximum outstanding requests, write() yields EDOM if exceeded */
++#define SG_MAX_QUEUE 16
++
++#define SG_BIG_BUFF SG_DEF_RESERVED_SIZE    /* for backward compatibility */
++
++/* Alternate style type names, "..._t" variants preferred */
++typedef struct sg_io_hdr Sg_io_hdr;
++typedef struct sg_io_vec Sg_io_vec;
++typedef struct sg_scsi_id Sg_scsi_id;
++typedef struct sg_req_info Sg_req_info;
+--- mt-st-0.9b.orig/debian/mt-st.files
++++ mt-st-0.9b/debian/mt-st.files
+@@ -0,0 +1,4 @@
++sbin/stinit
++bin/mt-st
++usr/share/man/man?/*
++etc/stinit.def
+--- mt-st-0.9b.orig/debian/copyright
++++ mt-st-0.9b/debian/copyright
+@@ -0,0 +1,14 @@
++This is the Debian packaged version of "mt-st" as found on:
++  ftp://ftp.ibiblio.org/pub/linux/system/backup/
++
++The software is Copyright 1996-2006 by Kai Mäkisara (email
++Kai.Makisara@kolumbus.fi).
++
++Packaging is Copyright (C) 2001, 2004 Philippe Troin <phil@fifi.org>,
++                           2006 Jan Christoph Nordholz
++                                <hesso@pool.math.tu-berlin.de>
++and is licensed under the GNU General Public License.
++
++This program and packaging are licensed under the terms of the GNU
++General Public License version 2, which can be found in
++/usr/share/common-licenses/GPL for Debian systems.
+--- mt-st-0.9b.orig/debian/mt-st.docs
++++ mt-st-0.9b/debian/mt-st.docs
+@@ -0,0 +1,2 @@
++README
++README.stinit
+--- mt-st-0.9b.orig/debian/stinit.def
++++ mt-st-0.9b/debian/stinit.def
+@@ -0,0 +1,8 @@
++# This file contains example definitions for different kinds of tape
++# devices. 
++#
++# You can find some examples in /usr/share/doc/mt-st/examples.
++#
++# Common definitions to be applied to all tape devices
++# (This is the driver's default)
++{buffer-writes read-ahead async-writes}
+--- mt-st-0.9b.orig/debian/mt-st.postinst
++++ mt-st-0.9b/debian/mt-st.postinst
+@@ -0,0 +1,9 @@
++#!/bin/sh -eu
++
++#DEBHELPER#
++
++if [ "$1" = configure ]; then
++    update-alternatives --install /bin/mt mt /bin/mt-st 20 \
++      --slave \
++	/usr/share/man/man1/mt.1.gz mt.1.gz /usr/share/man/man1/mt-st.1.gz
++fi
+--- mt-st-0.9b.orig/debian/mt-st.init
++++ mt-st-0.9b/debian/mt-st.init
+@@ -0,0 +1,54 @@
++#!/bin/sh
++### BEGIN INIT INFO
++# Provides:          mt-st
++# Required-Start:    $local_fs
++# Required-Stop:
++# Default-Start:     S
++# Default-Stop:
++# Short-Description: tape device initialization
++# Description:       tape device initialization
++#                    (calls stinit to set device parameters)
++### END INIT INFO
++
++PATH=/usr/sbin:/sbin:/usr/bin:/bin
++export PATH
++
++# Check for package existence
++test -x /sbin/stinit || exit 0
++
++# Check for package configuration
++test -f /etc/stinit.def || exit 0
++
++# Run the thing eventually
++case "$1" in
++    start)
++    	# Only start stinit if the st module is not loaded but the st device
++	# is in the kernel
++	# => only when we have st in the kernel
++	# When modules are used, modprobe takes care of doing things right.
++        if ! grep -q '^st[[:space:]]' /proc/modules \
++	&& grep -q '[[:space:]]st$' /proc/devices
++	then
++	    echo 'Initializing SCSI tapes...'
++	    stinit || exit $?
++	fi
++	;;
++    modload)
++	# modload may be called with a second argument (from udev), so just
++	# pass it on to stinit if it exists
++	if [ -n "$2" ]; then
++		stinit "$2"
++	else
++		stinit
++	fi
++	exit $?
++	;;
++    reload|restart|force-reload)
++        stinit || exit $?
++        ;;
++    stop)
++	;;
++    *)
++	echo "usage: $0 start|stop|reload|force-reload|restart|modload" 1>&2
++	exit 1
++esac
+--- mt-st-0.9b.orig/debian/mt-st.modules
++++ mt-st-0.9b/debian/mt-st.modules
+@@ -0,0 +1,2 @@
++# Reset the st driver on module insertion...
++post-install st /etc/init.d/mt-st modload > /dev/null 2> /dev/null
+--- mt-st-0.9b.orig/debian/mt-st.udev
++++ mt-st-0.9b/debian/mt-st.udev
+@@ -0,0 +1,3 @@
++# Use stinit to set default parameters on st device creation
++KERNEL=="st[0-9]",       RUN+="/etc/init.d/mt-st modload %n"
++KERNEL=="st[0-9]*[0-9]", RUN+="/etc/init.d/mt-st modload %n"
+--- mt-st-0.9b.orig/debian/mt-st.postrm
++++ mt-st-0.9b/debian/mt-st.postrm
+@@ -0,0 +1,5 @@
++#!/bin/sh -e
++
++#DEBHELPER#
++
++exit 0
+--- mt-st-0.9b.orig/debian/watch
++++ mt-st-0.9b/debian/watch
+@@ -0,0 +1,2 @@
++version=3
++ftp://ftp.ibiblio.org/pub/linux/system/backup/mt-st-(.*).tar.gz
+--- mt-st-0.9b.orig/debian/mt-st.prerm
++++ mt-st-0.9b/debian/mt-st.prerm
+@@ -0,0 +1,8 @@
++#!/bin/sh -eu
++
++#DEBHELPER#
++
++if [ "$1" = remove ]
++then
++    update-alternatives --remove mt /bin/mt-st
++fi
+--- mt-st-0.9b.orig/debian/changelog
++++ mt-st-0.9b/debian/changelog
+@@ -0,0 +1,142 @@
++mt-st (0.9b-4) unstable; urgency=medium
++
++  * Fix #include statements to accommodate the linux-kernel-headers /
++    linux-libc-dev transition. This closes an FTBFS bug, so raised urgency.
++    Closes: #428948. Thanks to Lucas Nussbaum.
++  * Add density code for LTO-3 drives. Closes: #429589. Thanks to Mike
++    Castleman.
++  * Add LSB header to initscript.
++
++ -- Jan Christoph Nordholz <hesso@pool.math.tu-berlin.de>  Fri, 15 Jun 2007 10:48:05 +0200
++
++mt-st (0.9b-3) unstable; urgency=low
++
++  * Work around something I believe to be a debhelper issue:
++    Fix postrm exit status, closes: #381901, forwarded as #381940.
++    Thanks to Eric Lavarde.
++
++ -- Jan Christoph Nordholz <hesso@pool.math.tu-berlin.de>  Sat, 12 Aug 2006 15:01:23 +0200
++
++mt-st (0.9b-2) unstable; urgency=low
++
++  * linux-kernel-headers was meant to be a _build_-dependency. Sorry.
++    Adjust dependencies, closes: #378391.
++  * Introduce udev rules to augment the list of scripts that may
++    be triggered by module load/unload and device insertion;
++    thanks to Alex Owen. Closes: #251114.
++  * Entrust most of the installation/removal package scripts' content
++    to debhelper.
++  * Update upstream hostname in debian/copyright in order to match
++    upstream's license file.
++  * Include a debian/watch file.
++
++ -- Jan Christoph Nordholz <hesso@pool.math.tu-berlin.de>  Mon, 17 Jul 2006 00:58:55 +0200
++
++mt-st (0.9b-1) unstable; urgency=low
++
++  * Take over the orphaned package. Closes: #374122.
++  * New upstream version, closes: #294646.
++    * Copy SG 3.x protocol definitions from the (2.6-)kernel scsi/sg.h
++      header. The stinit code provides a fallback, so this is safe
++      when running on kernels < 2.6.
++    * Introduce a new build-dependency on linux-kernel-headers for
++      the copied kernel header.
++  * Supply modprobe.d/ snippet in analogy to the already existing
++    modutils config file. Closes: #251114.
++  * Bump debhelper to version 5, clean up package build process.
++  * Remove -g from the compiler options.
++
++ -- Jan Christoph Nordholz <hesso@pool.math.tu-berlin.de>  Sun,  9 Jul 2006 02:47:08 +0200
++
++mt-st (0.8-2) unstable; urgency=low
++
++  * QA Upload
++  * Set Maintainer to QA Group (Orphaned, #374122)
++  * Fix short package description (Closes: #374877) 
++  * Bump up compat level, depend on at least dh 4.0.0
++  * Prefer using invoke-rc.d instead of directly calling the init 
++    script in postinst.
++  * Call update-modules only if command exists, otherwise package 
++    fails to install on module-less kernels (Closes: #271230)
++  * Conforms to latest Standards Version
++
++ -- Michael Ablassmeier <abi@debian.org>  Thu,  6 Jul 2006 11:11:04 +0200
++
++mt-st (0.8-1) unstable; urgency=low
++
++  * New upstream version.
++  * Updated copyright to specify both copyrights and licensing terms.
++  * Dropped the .lsm from mt-st.docs, it's redundant.
++
++ -- Philippe Troin <phil@fifi.org>  Wed, 14 Apr 2004 16:20:38 -0700
++
++mt-st (0.7-3) unstable; urgency=low
++
++  * Run update-modules for purge, not remove in postrm; closes: #145646.
++  * Update debian/rules with the new rules for DEB_BUILD_OPTIONS (noopt).
++  * Now compliant with Standards-Version 3.6.1.0.
++  * Applied a patch from upstream to fix a bug when stinit fails to
++    initialize the second of two identical drives.
++  * Changed build-depends on debhelper for v 3.0.0 instead of 2.2.0.
++  * Removed debian/mt-st.conffiles since debhelper does it for us.
++
++ -- Philippe Troin <phil@fifi.org>  Fri, 12 Mar 2004 17:14:20 -0800
++
++mt-st (0.7-2) unstable; urgency=low
++
++  * Allow stinit to detect tapes when /dev/tape<n> does not match the st
++    driver's idea of tape number <n>. This can happen with a modularized
++    st driver that is inserted and removed more than once.
++
++ -- Philippe Troin <phil@fifi.org>  Fri, 15 Mar 2002 20:11:47 -0800
++
++mt-st (0.7-1) unstable; urgency=low
++
++  * Fixed upstream version detection in debian/rules.
++  * New upstream release.
++
++ -- Philippe Troin <phil@fifi.org>  Mon, 26 Nov 2001 19:34:37 -0800
++
++mt-st (0.6-5) unstable; urgency=low
++
++  * Added debhelper to build-depends; closes: #104631.
++  * Upgraded to standards version 3.5.5.0.
++  * Added support for DEB_BUILD_OPTIONS.
++  * Added support for debian/rules get-orig-source.
++
++ -- Philippe Troin <phil@fifi.org>  Tue, 17 Jul 2001 22:38:40 -0700
++
++mt-st (0.6-4) unstable; urgency=low
++
++  * Add a patch from "merlin" <merlin@merlin.org> for devfs compatibility;
++    closes: #99906.
++  * Updated copyright to reflect current upstream sources location.
++
++ -- Philippe Troin <phil@fifi.org>  Mon,  2 Jul 2001 14:02:56 -0700
++
++mt-st (0.6-3) unstable; urgency=low
++
++  * Add a "eject" command for better compatibility with GNU mt; closes: #86664.
++
++ -- Philippe Troin <phil@fifi.org>  Tue, 20 Feb 2001 14:38:38 -0800
++
++mt-st (0.6-2) unstable; urgency=low
++ 
++  * Avoid stat()'ing all devices to prevent loading all possible modules,
++    we now stat only st* and nst* devices (at the expense of missing some
++    device files, but a Debian system ought to have devices named as they
++    should...); closes: #85978.
++
++ -- Philippe Troin <phil@fifi.org>  Thu, 15 Feb 2001 11:55:43 -0800
++
++mt-st (0.6-1.1) unstable; urgency=low
++
++  * Experimental release...
++
++ -- Philippe Troin <phil@fifi.org>  Wed, 14 Feb 2001 11:55:50 -0800
++
++mt-st (0.6-1) unstable; urgency=low
++
++  * New package; closes: #83810.
++
++ -- Philippe Troin <phil@fifi.org>  Sat, 27 Jan 2001 18:30:45 -0800
+--- mt-st-0.9b.orig/debian/rules
++++ mt-st-0.9b/debian/rules
+@@ -0,0 +1,84 @@
++#!/usr/bin/make -f
++# Debian rules file for mt-st.
++# Copyright (C) 2006 Jan Christoph Nordholz <hesso@pool.math.tu-berlin.de>
++# Copyright (C) 2001, 2004 Philippe Troin <phil@fifi.org>
++# Based on:
++#   Sample debian/rules that uses debhelper.
++#   GPL copyright 1997 to 1999 by Joey Hess.
++
++#export DH_VERBOSE=1
++#export DH_COMPAT=5
++
++#DEBCFLAGS:=-g
++WGET=wget
++ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
++  DEBCFLAGS+=-O0
++else
++  DEBCFLAGS+=-O2
++endif
++
++DEBVERSION:=$(shell head -1 debian/changelog \
++		    | sed -e 's/^[^(]*(\([^)]*\)).*/\1/')
++UPVERSION:=$(shell echo $(DEBVERSION) | sed -e 's/-.*$$//')
++
++build: build-stamp
++build-stamp:
++	dh_testdir
++	make CFLAGS="$(DEBCFLAGS)"
++	touch build-stamp
++
++clean:
++	dh_testdir
++	rm -f build-stamp
++	-make clean
++	dh_clean
++
++install: build
++	dh_testdir
++	dh_testroot
++	dh_clean -k
++	dh_installdirs
++
++	install -d debian/mt-st/sbin debian/mt-st/bin debian/mt-st/etc \
++		debian/mt-st/usr/share/man/man1 debian/mt-st/usr/share/man/man8
++	make install SBINDIR=debian/mt-st/sbin \
++		BINDIR=debian/mt-st/bin \
++		MANDIR=debian/mt-st/usr/share/man
++	cp debian/stinit.def debian/mt-st/etc/
++	mv debian/mt-st/bin/mt debian/mt-st/bin/mt-st
++	mv debian/mt-st/usr/share/man/man1/mt.1 \
++	   debian/mt-st/usr/share/man/man1/mt-st.1
++
++binary-indep: build install
++
++binary-arch: build install
++	dh_testdir
++	dh_testroot
++	dh_installdocs
++	dh_installexamples stinit.def.examples
++	dh_installinit -- start 30 S .
++	dh_installmodules
++	dh_installudev
++	dh_installchangelogs
++	dh_link
++	dh_strip
++	dh_compress
++	dh_fixperms
++	dh_installdeb
++	dh_shlibdeps
++	dh_gencontrol
++	dh_md5sums
++	dh_builddeb
++
++binary: binary-indep binary-arch
++
++print-version:
++	@@echo "Debian version:          $(DEBVERSION)"
++	@@echo "Upstream version:        $(UPVERSION)"
++
++get-orig-source:
++	$(WGET) -O mt-st_$(UPVERSION).orig.tar.gz \
++	  ftp://sunsite.unc.edu/pub/Linux/system/backup/mt-st-$(UPVERSION).tar.gz
++
++.PHONY: build clean binary-indep binary-arch binary install print-version \
++	get-orig-source
+--- mt-st-0.9b.orig/debian/compat
++++ mt-st-0.9b/debian/compat
+@@ -0,0 +1 @@
++5
+--- mt-st-0.9b.orig/debian/mt-st.modprobe
++++ mt-st-0.9b/debian/mt-st.modprobe
+@@ -0,0 +1 @@
++install st /sbin/modprobe --ignore-install st && /etc/init.d/mt-st modload >/dev/null 2>/dev/null
+--- mt-st-0.9b.orig/debian/control
++++ mt-st-0.9b/debian/control
+@@ -0,0 +1,18 @@
++Source: mt-st
++Section: admin
++Priority: extra
++Maintainer: Jan Christoph Nordholz <hesso@pool.math.tu-berlin.de>
++Build-Depends: debhelper (>= 5), linux-kernel-headers
++Standards-Version: 3.7.2
++
++Package: mt-st
++Architecture: any
++Depends: ${shlibs:Depends}
++Description: Linux SCSI tape driver aware magnetic tape control (aka mt)
++ Mt-st contains a version of "mt" that is aware of Linux's SCSI tape
++ driver. Mt-st is able to set some esoteric control flags like tape partitions.
++ .
++ Mt-st diverts (replaces) the GNU version of mt, in the cpio package.
++ .
++ It also comes with stinit, a program to be run at boot time to set up
++ tape defaults.

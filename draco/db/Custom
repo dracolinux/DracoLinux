@@ -1,0 +1,18 @@
+rm -rf build-dir
+mkdir build-dir || exit 1
+cd build-dir || exit 1
+CFLAGS="$DRACOSRC_FLAGS" \
+CXXFLAGS="$DRACOSRC_CFLAGS" \
+../dist/configure $DRACOSRC_PKG_CONFIGURE || exit 1
+
+make -j4 || exit 1
+make install prefix=$DRACOSRC_PKG/usr || exit 1
+
+rm -rf $DRACOSRC_PKG/usr/docs
+
+mkdir -p $DRACOSRC_PKG/lib || exit 1
+mv $DRACOSRC_PKG/usr/lib/libdb-4.5.so $DRACOSRC_PKG/lib/libdb-4.5.so || exit 1
+( cd $DRACOSRC_PKG/usr/lib
+  ln -sf /lib/libdb-4.5.so .
+)
+

@@ -1,0 +1,56 @@
+#!/bin/sh
+#
+# rc.inet2	This shell script boots up the entire network system.
+#		Note, that when this script is used to also fire
+#		up any important remote NFS disks (like the /usr
+#		directory), care must be taken to actually
+#		have all the needed binaries online _now_ ...
+#
+#               Uncomment or comment out sections depending on which
+#               services your site requires.
+#
+# Author:	Fred N. van Kempen, <waltje@uwalt.nl.mugnet.org>
+# Modified for Slackware by Patrick Volkerding <volkerdi@slackware.com>
+# Modified for Draco by Ole Andre Rodlie <olear@slackforge.net>
+
+# At this point, we are ready to talk to The World...
+
+# Mount remote (NFS) filesystems:
+if cat /etc/fstab | grep -v '^#' | grep -w nfs 1> /dev/null 2> /dev/null ; then
+  if [ -x /usr/local/sbin/portmap ]; then
+    echo "Starting portmap: /usr/local/sbin/portmap"
+    /usr/local/sbin/portmap
+    echo "Mounting remote (NFS) file systems:  /sbin/mount -a -t nfs"
+    /sbin/mount -a -t nfs          # This may be our /usr runtime!
+    # Show the mounted volumes:
+    /sbin/mount -v -t nfs
+  fi
+fi
+
+# Mount remote (SMB) filesystems:
+if cat /etc/fstab | grep -v '^#' | grep -w smbfs 1> /dev/null 2> /dev/null ; then
+  echo "Mounting remote (SMB) file systems:  /sbin/mount -a -t smbfs"
+  /sbin/mount -a -t smbfs
+  # Show the mounted volumes:
+  /sbin/mount -v -t smbfs
+fi
+
+# Start the system logger if it is not already running (maybe because /usr
+# is on a network partition).
+if [ -x /etc/rc.d/rc.syslog -a -d /var/log -a ! -r /var/run/syslogd.pid ]; then
+  . /etc/rc.d/rc.syslog start
+fi
+
+# If there is a firewall script, run it before enabling packet forwarding.
+# See the HOWTOs on http://www.netfilter.org/ for documentation on
+# setting up a firewall or NAT on Linux.  In some cases this might need to
+# be moved past the section below dealing with IP packet forwarding.
+if [ -x /etc/rc.d/rc.firewall ]; then
+  /etc/rc.d/rc.firewall start
+fi
+
+# Turn on IPv4 packet forwarding support.
+if [ -x /etc/rc.d/rc.ip_forward ]; then
+  . /etc/rc.d/rc.ip_forward start
+fi
+

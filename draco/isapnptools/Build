@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="isapnptools"
+DRACOSRC_PKG_VERSION="1.27"
+DRACOSRC_PKG_BUILD=7
+DRACOSRC_PKG_DESC="ISA Plug-And-Play tools"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --mandir=/usr/man"

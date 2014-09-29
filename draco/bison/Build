@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="bison"
+DRACOSRC_PKG_VERSION="2.3"
+DRACOSRC_PKG_BUILD=10
+DRACOSRC_PKG_DESC="parser generator similar to yacc"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr"

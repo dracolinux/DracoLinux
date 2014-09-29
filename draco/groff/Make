@@ -1,0 +1,3 @@
+make || exit 1
+mkdir -p $DRACOSRC_PKG/usr || exit 1
+make install prefix=$DRACOSRC_PKG/usr || exit 1

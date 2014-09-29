@@ -1,0 +1,17 @@
+
+( cd $DRACOSRC_PKG/usr/sbin ;
+  mkdir ../../sbin
+  mv convertquota ../../sbin/
+  ln -sf ../../sbin/convertquota convertquota
+  mv quotacheck ../../sbin/
+  ln -sf ../../sbin/quotacheck quotacheck
+  mv quotaon ../../sbin/
+  ln -sf ../../sbin/quotaon quotaon
+  mv quotaoff ../../sbin/
+  ln -sf ../../sbin/quotaoff quotaoff
+)
+( cd $DRACOSRC_PKG/etc ;
+  mv warnquota.conf warnquota.conf-sample
+  mv quotatab quotatab-sample
+  mv quotagrpadmins quotagrpadmins-sample
+)

@@ -1,0 +1,2 @@
+rm -rf $DRACOSRC_PKG/usr/bin || exit 1
+rm -f $DRACOSRC_PKG/usr/man5/{tar.5,cpio.5,mtree.5} || exit 1

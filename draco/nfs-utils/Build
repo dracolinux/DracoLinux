@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="nfs-utils"
+DRACOSRC_PKG_VERSION="1.1.6"
+DRACOSRC_PKG_BUILD=6
+DRACOSRC_PKG_DESC="Support programs for NFS"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --mandir=/usr/man --with-statedir=/var/lib/nfs --enable-nfsv3 --enable-nfsv4=no --enable-gss=no --enable-secure-statd" 

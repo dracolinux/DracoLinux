@@ -1,0 +1,62 @@
+Slackware pkgtools
+
+ Copyright 1994, 1998, 2000  Patrick Volkerding, Concord, CA, USA
+ Copyright 2001, 2003  Slackware Linux, Inc., Concord, CA, USA
+ Copyright 2007  Patrick Volkerding, Sebeka, MN, USA
+ All rights reserved.
+
+ Redistribution and use of this script, with or without modification, is
+ permitted provided that the following conditions are met:
+
+ 1. Redistributions of this script must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO
+  EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+----------------
+
+Slackware is a registered trademark of Patrick Volkerding and Slackware Linux, Inc.
+Permission to use the Slackware trademark to refer to the Slackware distribution
+of Linux is hereby granted if the following conditions are met:
+
+1.  In order to be called "Slackware", the distribution may not be altered
+    from the way it appears on the central FTP site (ftp.slackware.com).  This
+    is to protect the integrity, reliability, and reputation of the Slackware
+    distribution.  (Note that moving entire directories like "source" or
+    "contrib" to a second CD-ROM is allowable, but leaving them out and 
+    distributing a single source-free disc is *not*, as indicated below)
+    Anyone wishing to distribute an altered version must have the changes
+    approved by volkerdi@slackware.com (i.e. certified to be reasonably
+    bug-free).  If the changed distribution meets the required standards for
+    quality, then written permission to use the Slackware trademark may be
+    provided.
+
+2.  All related source code must be included.  (This is also required by the
+    GNU General Public License)
+
+3.  Except by written permission from Slackware Linux, Inc., the Slackware
+    trademark may not be used as (or as part of) a product name, company
+    name, or registered domain name.
+
+4.  Any approved use of "Slackware" must be followed by a circle-R, and must
+    acknowledge our ownership of the mark.
+
+Note that you can still redistribute a distribution that doesn't meet these
+criteria, you just can't call it "Slackware".  Personally, I hate restricting
+things in any way, but these restrictions are not designed to make life
+difficult for anyone.  I just want to make sure that bugs are not added to
+commercial redistributions of Slackware.  They have been in the past, and
+the resulting requests for help have flooded my mailbox!  I'm just trying to
+make sure that I have some recourse when something like that happens.
+
+Any questions about this policy should be directed to:
+    Patrick Volkerding <volkerdi@slackware.com>

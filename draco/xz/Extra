@@ -1,0 +1,1 @@
+rm -r $DRACOSRC_PKG/usr/share/doc

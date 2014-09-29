@@ -1,0 +1,5 @@
+make || exit 1
+strip setserial
+mkdir -p $DRACOSRC_PKG/sbin
+cat setserial > $DRACOSRC_PKG/sbin/setserial
+chmod 755 $DRACOSRC_PKG/sbin/setserial

@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="shadow"
+DRACOSRC_PKG_VERSION="4.0.3"
+DRACOSRC_PKG_BUILD=10
+DRACOSRC_PKG_DESC="Shadow password file utilities"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --disable-shared --disable-desrpc -mandir=/usr/man --sysconfdir=/etc --build=$DRACOSRC_ARCH-draco-linux"

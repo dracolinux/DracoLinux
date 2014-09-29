@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="libtool"
+DRACOSRC_PKG_VERSION="1.5.24"
+DRACOSRC_PKG_BUILD=6
+DRACOSRC_PKG_DESC="A generic library support script"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --build=$DRACOSRC_ARCH-draco-linux"

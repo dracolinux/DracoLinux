@@ -1,0 +1,6 @@
+DRACOSRC_PKG_NAME="squashfs-tools"
+DRACOSRC_PKG_ALT_NAME="squashfs"
+DRACOSRC_PKG_VERSION="4.0"
+DRACOSRC_PKG_ALT_VERSION="${DRACOSRC_PKG_VERSION}"
+DRACOSRC_PKG_BUILD=4
+DRACOSRC_PKG_DESC="Tools for squashfs, a highly compressed read-only filesystem for Linux."

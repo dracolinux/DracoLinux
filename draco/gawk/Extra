@@ -1,0 +1,10 @@
+mkdir -p $DRACOSRC_PKG/bin || exit 1
+mv $DRACOSRC_PKG/usr/bin/* $DRACOSRC_PKG/bin/ || exit 1
+( cd $DRACOSRC_PKG/usr/bin;
+  ln -sf ../../bin/gawk awk || exit 1
+  ln -sf ../../bin/gawk gawk || exit 1
+  ln -sf ../../bin/pgawk pgawk || exit 1
+  ln -sf ../../bin/gawk-$DRACOSRC_PKG_VERSION gawk-$DRACOSRC_PKG_VERSION || exit 1
+  ln -sf ../../bin/pgawk-$DRACOSRC_PKG_VERSION pgawk-$DRACOSRC_PKG_VERSION || exit 1
+  ln -sf ../../bin/igawk igawk || exit
+) 

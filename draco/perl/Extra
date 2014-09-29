@@ -1,0 +1,14 @@
+
+( cd $DRACOSRC_PKG/usr/bin ;
+  ln -sf perl$DRACOSRC_PKGVERSION perl || exit 1
+  ln -sf c2ph pstruct || exit 1
+  ln -sf s2p psed || exit 1
+)
+
+( cd $DRACOSRC_PKG/usr/share ;
+  mv man .. || exit 1
+)
+
+chmod 755 $DRACOSRC_PKG/usr/bin/*
+chmod 644 $DRACOSRC_PKG/usr/man/man?/*
+rm -rf $DRACOSRC_PKG/usr/share

@@ -1,0 +1,4 @@
+mkdir -p $DRACOSRC_PKG/etc/profile.d/
+cat $DRACOSRC_PKG_SRC_DIR/pkgconfig.sh > $DRACOSRC_PKG/etc/profile.d/pkgconfig.sh || exit 1
+chmod 755 $DRACOSRC_PKG/etc/profile.d/*
+rm -r $DRACOSRC_PKG/usr/share/doc

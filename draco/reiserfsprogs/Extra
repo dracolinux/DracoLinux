@@ -1,0 +1,6 @@
+
+mv $DRACOSRC_PKG/usr/sbin $DRACOSRC_PKG || exit 1
+( cd $DRACOSRC_PKG/sbin
+  ln -sf mkreiserfs mkfs.reiserfs
+  ln -sf reiserfsck fsck.reiserfs
+)

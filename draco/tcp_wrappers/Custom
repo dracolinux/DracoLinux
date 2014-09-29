@@ -1,0 +1,27 @@
+
+CFLAGS="$DRACOSRC_CFLAGS" CXXFLAGS="$DRACOSRC_CFLAGS" make REAL_DAEMON_DIR=/usr/sbin STYLE=-DPROCESS_OPTIONS linux || exit 1
+
+mkdir -p $DRACOSRC_PKG/usr/lib
+cat libwrap.a > $DRACOSRC_PKG/usr/lib/libwrap.a || exit 1
+cp -a shared/libwrap* $DRACOSRC_PKG/usr/lib/ || exit 1
+
+mkdir -p $DRACOSRC_PKG/usr/include
+cat tcpd.h > $DRACOSRC_PKG/usr/include/tcpd.h || exit 1
+
+mkdir -p $DRACOSRC_PKG/usr/sbin
+cat safe_finger > $DRACOSRC_PKG/usr/sbin/safe_finger || exit 1
+cat tcpd > $DRACOSRC_PKG/usr/sbin/tcpd || exit 1
+cat tcpdchk > $DRACOSRC_PKG/usr/sbin/tcpdchk || exit 1
+cat tcpdmatch > $DRACOSRC_PKG/usr/sbin/tcpdmatch || exit 1
+cat try-from > $DRACOSRC_PKG/usr/sbin/try-from || exit 1
+
+chmod 755 $DRACOSRC_PKG/usr/sbin/*
+
+mkdir -p $DRACOSRC_PKG/usr/man/man{3,5,8}
+cat hosts_access.3 > $DRACOSRC_PKG/usr/man/man3/hosts_access.3 || exit 1
+cat hosts_access.5 > $DRACOSRC_PKG/usr/man/man5/hosts_access.5 || exit 1
+cat hosts_options.5 > $DRACOSRC_PKG/usr/man/man5/hosts_options.5 || exit 1
+cat tcpd.8 > $DRACOSRC_PKG/usr/man/man8/tcpd.8 || exit 1
+cat tcpdchk.8 > $DRACOSRC_PKG/usr/man/man8/tcpdchk.8 || exit 1
+cat tcpdmatch.8 > $DRACOSRC_PKG/usr/man/man8/tcpdmatch.8 || exit 1
+

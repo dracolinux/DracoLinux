@@ -1,0 +1,3 @@
+mkdir -p $DRACOSRC_PKG/usr/sbin || exit 1
+cat update-usbids.sh > $DRACOSRC_PKG/usr/sbin/update-usbids || exit 1
+chmod 755 $DRACOSRC_PKG/usr/sbin/update-usbids

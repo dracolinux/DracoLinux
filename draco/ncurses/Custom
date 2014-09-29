@@ -1,0 +1,53 @@
+
+CFLAGS="${DRACOSRC_FLAGS}" CXXFLAGS="${DRACOSRC_FLAGS}" ./configure ${DRACOSRC_PKG_CONFIGURE} $DRACOSRC_ARCH-draco-linux || exit 1
+make -j4 || exit 1
+make install
+make install DESTDIR=$DRACOSRC_PKG
+
+make clean
+
+CFLAGS="${DRACOSRC_FLAGS}" CXXFLAGS="${DRACOSRC_FLAGS}" ./configure ${DRACOSRC_PKG_CONFIGURE} --enable-widec $DRACOSRC_ARCH-draco-linux || exit 1
+make -j4 || exit 1
+make install
+make install DESTDIR=$DRACOSRC_PKG
+
+if [ ! -d $DRACOSRC_PKG/usr/include/ncursesw -a ! -L $DRACOSRC_PKG/usr/include/ncursesw ]; then
+  ( cd $DRACOSRC_PKG/usr/include ; ln -sf ncurses ncursesw )
+fi
+
+
+( cd $DRACOSRC_PKG/usr/include ;
+  rm -rf ncurses || exit 1
+  mkdir ncurses || exit 1
+  mv *.h ncurses || exit 1
+  for file in ncurses/* ; do
+    ln -sf $file . || exit 1
+  done
+  # This shouldn't clobber the real one:
+  #mv termcap.h termcap-ncurses.h
+)
+
+mkdir -p $DRACOSRC_PKG/lib || exit 1
+( cd $DRACOSRC_PKG/usr/lib ;
+  chmod 755 *.so
+  chmod 644 *.a
+  mv libncurses.so.5* $DRACOSRC_PKG/lib || exit 1
+  mv libncursesw.so.5* $DRACOSRC_PKG/lib || exit 1
+  rm -f libncurses.so || exit 1
+  ln -sf /lib/libncurses.so.5 libncurses.so || exit 1
+  rm -f libncursesw.so || exit 1
+  ln -sf /lib/libncursesw.so.5 libncursesw.so || exit 1
+  # Olde obsolete names, just in case
+  rm -f libcurses.so
+  ln -sf libncurses.so libcurses.so
+  rm -f libcursesw.so
+  ln -sf libncursesw.so libcursesw.so
+)
+
+export TERMINFO=$DRACOSRC_PKG/usr/share/terminfo
+for tfile in $DRACOSRC_PKG_SRC_DIR/xterm.terminfo $DRACOSRC_PKG_SRC_DIR/screeninfo.src $DRACOSRC_PKG_SRC_DIR/rxvt.terminfo $DRACOSRC_PKG_SRC_DIR/Eterm.ti ; do
+  if [ -r $tfile ]; then
+    progs/tic -v $tfile
+  fi
+done
+unset TERMINFO

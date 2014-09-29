@@ -1,0 +1,49 @@
+--- ./src/pathnames.h.orig	2006-04-07 17:54:58.000000000 -0500
++++ ./src/pathnames.h	2006-07-25 23:51:46.000000000 -0500
+@@ -28,7 +28,7 @@
+ #include <paths.h>
+ #include "dhcpcd.h"
+ 
+-#define PID_FILE_PATH		"/var/run/"PACKAGE"-%s.pid"
++#define PID_FILE_PATH		"/etc/dhcpc/"PACKAGE"-%s.pid"
+ #define DHCP_CACHE_FILE		"%s/"PACKAGE"-%s.cache"
+ #define DHCP_HOSTINFO		"%s/"PACKAGE"-%s.info"
+ #define EXEC_ON_CHANGE		"/etc/dhcpc/"PACKAGE".exe"
+@@ -38,7 +38,7 @@
+ #define CONFIG_DIR		"/etc/config/dhcpc"
+ #else
+ #define ETC_DIR			"/etc"
+-#define CONFIG_DIR		"/var/lib/dhcpc"
++#define CONFIG_DIR		"/etc/dhcpc"
+ #endif
+ 
+ #define RESOLV_FILE		"%s/resolv.conf"
+--- ./src/dhcpcd.8.orig	2006-04-07 17:54:58.000000000 -0500
++++ ./src/dhcpcd.8	2006-07-25 23:52:51.000000000 -0500
+@@ -200,7 +200,7 @@
+ will use
+ .I <ConfigDir>
+ directory instead of default
+-.I /var/lib/dhcpc
++.I /etc/dhcpc
+ to store configuration information.
+ .TP
+ .BI \-S
+@@ -350,7 +350,7 @@
+ .SH FILES
+ .PD 0
+ .TP
+-.BI /var/lib/dhcpc
++.BI /etc/dhcpc
+ Default 
+ .I <ConfigDir>
+ directory used for storing files
+@@ -448,7 +448,7 @@
+ .B dhcpcd
+ exits for any reason.
+ .TP
+-.BI /var/run/dhcpcd-<interface>.pid
++.BI /etc/dhcpcd-<interface>.pid
+ file containing the process id of
+ .B dhcpcd.
+ The word

@@ -1,0 +1,38 @@
+mkdir -p $DRACOSRC_PKG/sbin
+( cd $DRACOSRC_PKG ; 
+  ln -s /lib/udev/scsi_id sbin/scsi_id
+#  ln -s /lib/udev/vol_id sbin/vol_id
+)
+
+rm -r $DRACOSRC_PKG/etc/udev
+
+mkdir -p $DRACOSRC_PKG/lib/firmware \
+	 $DRACOSRC_PKG/etc/udev \
+	 $DRACOSRC_PKG/etc/modprobe.d \
+         $DRACOSRC_PKG/etc/rc.d
+
+cp -a $DRACOSRC_PKG_SRC_DIR/config/udev.conf $DRACOSRC_PKG/etc/udev/udev.conf || exit 1
+cp -a $DRACOSRC_PKG_SRC_DIR/config/rules.d/* $DRACOSRC_PKG/lib/udev/rules.d/ || exit 1
+cp -a $DRACOSRC_PKG_SRC_DIR/config/rc.d/rc.udev.new $DRACOSRC_PKG/etc/rc.d/rc.udev.new || exit 1
+cp -a $DRACOSRC_PKG_SRC_DIR/config/modprobe.d/* $DRACOSRC_PKG/etc/modprobe.d/ || exit 1
+
+chmod 644 $DRACOSRC_PKG/etc/udev/udev.conf \
+  $DRACOSRC_PKG/lib/udev/rules.d/* \
+  $DRACOSRC_PKG/etc/modprobe.d/* || exit 1
+
+chmod 755 $DRACOSRC_PKG/etc/rc.d/rc.udev.new
+
+chown root:root $DRACOSRC_PKG/etc/udev/udev.conf \
+  $DRACOSRC_PKG/lib/udev/rules.d/* \
+  $DRACOSRC_PKG/etc/modprobe.d/* \
+  $DRACOSRC_PKG/etc/rc.d/rc.udev.new || exit 1
+
+for file in $DRACOSRC_PKG_SRC_DIR/config/scripts/* ; do
+  cp -a $file $DRACOSRC_PKG/lib/udev/
+done
+
+chmod 755 $DRACOSRC_PKG/lib/udev/* || exit 1
+chown root:root $DRACOSRC_PKG/lib/udev/* || exit 1
+rm -r $DRACOSRC_PKG/usr/share/gtk* $DRACOSRC_PKG/usr/share/doc
+rm -r $DRACOSRC_PKG/usr/lib/Console*
+find extras/ -name "*\.8" -exec cp -a {} $DRACOSRC_PKG/usr/man/man8 \;

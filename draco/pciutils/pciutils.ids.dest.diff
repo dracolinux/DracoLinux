@@ -1,0 +1,13 @@
+--- ./update-pciids.sh.orig	2006-09-09 05:36:17.000000000 -0500
++++ ./update-pciids.sh	2007-06-04 22:47:20.000000000 -0500
+@@ -1,8 +1,8 @@
+ #!/bin/sh
+ 
+ set -e
+-SRC="http://pciids.sourceforge.net/v2.2/pci.ids"
+-DEST=pci.ids
++SRC="http://pciids.sourceforge.net/pci.ids"
++DEST=/usr/share/pci.ids
+ PCI_COMPRESSED_IDS=
+ GREP=grep
+ 

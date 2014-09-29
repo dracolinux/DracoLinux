@@ -1,0 +1,1 @@
+cp $DRACOSRC_PKG_SRC_DIR/usb.ids .

@@ -1,0 +1,19 @@
+
+mkdir -p $DRACOSRC_PKG/usr/{lib,info} || exit 1
+mkdir -p $DRACOSRC_PKG/lib || exit 1
+mkdir -p $DRACOSRC_PKG/include || exit 1
+
+make || exit 1
+make install prefix=$DRACOSRC_PKG || exit 1
+
+( cd $DRACOSRC_PKG;
+  mv include usr/
+  mv lib/libtermcap.a usr/lib/
+)
+
+cp $DRACOSRC_PKG_SRC/termcap.info* $DRACOSRC_PKG/usr/info/ || exit 1
+
+( cd $DRACOSRC_PKG/lib;
+  ln -sf libtermcap.so.2.0.8 libtermcap.so.2
+  ln -sf libtermcap.so.2.0.8 libtermcap.so
+)

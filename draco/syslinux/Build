@@ -1,0 +1,4 @@
+DRACOSRC_PKG_NAME=syslinux
+DRACOSRC_PKG_VERSION=3.86
+DRACOSRC_PKG_BUILD=3
+DRACOSRC_PKG_DESC="Collection of fat/dos/cdrom/pxelinux bootloaders"

@@ -1,0 +1,11 @@
+
+( cd $DRACOSRC_PKG/usr/sbin
+  rm -f xfsdump xfsrestore
+  ln -sf ../../sbin/xfsdump xfsdump
+  ln -sf ../../sbin/xfsrestore xfsrestore
+)
+
+rm -f $DRACOSRC_PKG/usr/lib/*.la
+
+mv $DRACOSRC_PKG/usr/share/doc $DRACOSRC_PKG/usr
+( cd $DRACOSRC_PKG/usr/doc ; mv xfsdump xfsdump-$DRACOSRC_PKG_VERSION )

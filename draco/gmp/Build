@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME=gmp
+DRACOSRC_PKG_VERSION=5.0.5
+DRACOSRC_PKG_BUILD=8
+DRACOSRC_PKG_DESC="GNU multiple precision arithmetic library"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --with-gnu-ld --enable-cxx --enable-mpbsd --enable-mpfr $DRACOSRC_ARCH-draco-linux-gnu"

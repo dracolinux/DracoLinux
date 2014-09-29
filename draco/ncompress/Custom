@@ -1,0 +1,18 @@
+
+make ENDIAN=4321 || exit 1
+
+mkdir -p $DRACOSRC_PKG/{bin,usr/bin,usr/man/man1} || exit 1
+
+cat compress > $DRACOSRC_PKG/bin/compress || exit 1
+cat compress.1 > $DRACOSRC_PKG/usr/man/man1/compress.1 || exit 1
+
+chmod 755 $DRACOSRC_PKG/bin/compress
+
+( cd $DRACOSRC_PKG ;
+  ( cd bin ; ln -sf compress uncompress )
+  ( cd usr/bin ;
+    ln -sf ../../bin/compress compress
+    ln -sf compress uncompress
+  )
+  ( cd usr/man/man1 ; ln -sf compress.1 uncompress.1 )
+)

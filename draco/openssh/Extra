@@ -1,0 +1,23 @@
+
+mkdir -p $DRACOSRC_PKG/var/empty
+chmod 755 $DRACOSRC_PKG/var/empty
+
+( cd contrib
+  cp -a ssh-copy-id $DRACOSRC_PKG/usr/bin/
+  chmod 755 $DRACOSRC_PKG/usr/bin/ssh-copy-id
+  cat ssh-copy-id.1 > $DRACOSRC_PKG/usr/man/man1/ssh-copy-id.1
+)
+
+rm -f $DRACOSRC_PKG/etc/ssh/ssh_host_dsa_key
+rm -f $DRACOSRC_PKG/etc/ssh/ssh_host_dsa_key.pub
+rm -f $DRACOSRC_PKG/etc/ssh/ssh_host_rsa_key
+rm -f $DRACOSRC_PKG/etc/ssh/ssh_host_rsa_key.pub
+rm -f $DRACOSRC_PKG/etc/ssh/ssh_host_key
+rm -f $DRACOSRC_PKG/etc/ssh/ssh_host_key.pub
+
+mv $DRACOSRC_PKG/etc/ssh/ssh_config $DRACOSRC_PKG/etc/ssh/ssh_config.new
+mv $DRACOSRC_PKG/etc/ssh/sshd_config $DRACOSRC_PKG/etc/ssh/sshd_config.new
+
+mkdir -p $DRACOSRC_PKG/etc/rc.d
+cat $DRACOSRC_PKG_SRC_DIR/rc.sshd > $DRACOSRC_PKG/etc/rc.d/rc.sshd.new
+chmod 755 $DRACOSRC_PKG/etc/rc.d/rc.sshd.new

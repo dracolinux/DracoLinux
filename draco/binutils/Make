@@ -1,0 +1,6 @@
+make configure-host || exit 1
+make tooldir=$DRACOSRC_PKG/usr || exit 1
+make prefix=$DRACOSRC_PKG/usr tooldir=$DRACOSRC_PKG/usr install || exit 1
+install -m 644 include/libiberty.h $DRACOSRC_PKG/usr/include || exit 1
+rm -f $DRACOSRC_PKG/usr/man/man1/{dlltool,nlmconv,windres}*
+rm -f $DRACOSRC_PKG/usr/lib/lib{bfd,opcodes}.so

@@ -1,0 +1,3 @@
+
+sed -e 's%etc/adjtime%var/lib/hwclock/adjtime%' -i hwclock/hwclock.c 
+mkdir -p $DRACOSRC_PKG/var/lib/hwclock

@@ -1,0 +1,14 @@
+--- update-pciids.sh.orig	2008-03-16 02:38:48.696040001 +0100
++++ update-pciids.sh	2008-03-16 02:41:12.099039160 +0100
+@@ -26,8 +26,10 @@
+ 	DL="wget -O $DEST.new $SRC"
+ elif which lynx >/dev/null ; then
+ 	DL="eval lynx -source $SRC >$DEST.new"
++elif which ftp >/dev/null ; then
++	DL="/bin/ftp -o $DEST.new $SRC"
+ else
+-	echo >&2 "update-pciids: cannot find curl, wget or lynx"
++	echo >&2 "update-pciids: cannot find curl, wget, lynx or ftp"
+ 	exit 1
+ fi
+ 

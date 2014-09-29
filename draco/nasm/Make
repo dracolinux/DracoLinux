@@ -1,0 +1,6 @@
+make || exit 1
+mkdir -p $DRACOSRC_PKG/usr/{bin,man/man1}
+make install INSTALLROOT=$DRACOSRC_PKG
+mv $DRACOSRC_PKG/usr/share/man/man1/* $DRACOSRC_PKG/usr/man/man1/  || exit 1
+rm -r $DRACOSRC_PKG/usr/share || exit 1
+

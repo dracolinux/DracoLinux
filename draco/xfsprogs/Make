@@ -1,0 +1,4 @@
+
+export DEBUG=-DNDEBUG
+make || exit 1
+make DIST_ROOT=$DRACOSRC_PKG install install-dev || exit 1

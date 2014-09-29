@@ -1,0 +1,17 @@
+
+make LIBS=-lm || exit 1
+make prefix=$DRACOSRC_PKG/usr install || exit 1
+
+cat $DRACOSRC_PKG_SRC_DIR/mouseconfig > $DRACOSRC_PKG/usr/sbin/mouseconfig || exit 
+chmod 755 $PKG/usr/bin/* $PKG/usr/sbin/*
+
+mkdir -p $DRACOSRC_PKG/var/log/setup || exit 
+cat $DRACOSRC_PKG_SRC_DIR/setup.mouse > $DRACOSRC_PKG/var/log/setup/setup.mouse || exit 1
+chmod 755 $DRACOSRC_PKG/var/log/setup/setup.mouse || exit 1
+
+chmod 755 $DRACOSRC_PKG/usr/lib/libgpm.so.*
+
+( cd $DRACOSRC_PKG/usr ;
+  mv share/* .
+  rm -rf share
+)

@@ -1,0 +1,7 @@
+mkdir -p $DRACOSRC_PKG/usr/bin || exit 1
+( cd $DRACOSRC_PKG/usr/bin :
+  ln -sf ../../bin/grep .
+  ln -sf ../../bin/egrep .
+  ln -sf ../../bin/fgrep .
+)
+

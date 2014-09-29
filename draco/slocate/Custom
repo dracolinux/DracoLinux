@@ -1,0 +1,9 @@
+
+cd src
+make CFLAGS="$DRACOSRC_FLAGS" || exit 1
+mkdir -p $DRACOSRC_PKG/usr/bin
+cat slocate > $DRACOSRC_PKG/usr/bin/slocate || exit 1
+cd ..
+mkdir -p $DRACOSRC_PKG/usr/man/man1
+cat doc/slocate.1 > $DRACOSRC_PKG/usr/man/man1/slocate.1 || exit 1
+cat doc/updatedb.1 > $DRACOSRC_PKG/usr/man/man1/updatedb.1 || exit 1

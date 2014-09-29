@@ -1,0 +1,8 @@
+make install-dev DESTDIR=$DRACOSRC_PKG || exit 1
+make install-lib DESTDIR=$DRACOSRC_PKG || exit 1
+
+mv $DRACOSRC_PKG/usr/share/doc $DRACOSRC_PKG/usr || exit 1
+( cd $DRACOSRC_PKG/usr/doc ; mv $DRACOSRC_PKG_NAME $DRACOSRC_PKG_NAME-$DRACOSRC_PKG_VERSION )
+
+rm -f $DRACOSRC_PKG/lib/*.a $DRACOSRC_PKG/lib/libacl.so $DRACOSRC_PKG/lib/*.la $DRACOSRC_PKG/usr/lib/*.la || exit 1
+( cd $DRACOSRC_PKG/usr/lib ; rm -f libacl.so ; ln -sf /lib/libacl.so.1 libacl.so )

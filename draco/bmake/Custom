@@ -1,0 +1,14 @@
+./boot-strap $DRACOSRC_PKG_CONFIGURE || exit 1
+
+tar xvJf $DRACOSRC_CACHE/libnbcompat-20120702.tar.xz || exit 1
+mv libnbcompat-20120702 libnbcompat
+( cd libnbcompat ;
+  ./configure && Linux/bmake
+)
+
+Linux/bmake clean
+
+CFLAGS="$DRACOSRC_FLAGS -DHAVE_NBCOMPATH=1 -Lnbcompat -Inbcompat" LIBS="-lnbcompat" ./boot-strap $DRACOSRC_PKG_CONFIGURE || exit 1
+mkdir -p $DRACOSRC_PKG/usr/bin $DRACOSRC_PKG/usr/man/man1 || exit 1
+cp Linux/bmake $DRACOSRC_PKG/usr/bin/ || exit 1
+cat bmake.1 > $DRACOSRC_PKG/usr/man/man1/bmake.1 || exit 1

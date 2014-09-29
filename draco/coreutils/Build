@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME=coreutils
+DRACOSRC_PKG_VERSION=0.4.2012.10
+DRACOSRC_PKG_BUILD=5
+DRACOSRC_PKG_DESC="DracoLinux Core Utilties"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --bindir=/bin --mandir=/usr/man --infodir=/usr/info --sysconfdir=/etc --build=$DRACOSRC_ARCH-draco-linux"

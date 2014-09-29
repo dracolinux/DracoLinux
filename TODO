@@ -1,0 +1,5 @@
+- tzcode/tzdata 2012j should be included. Note major changes not compatible with our build script.
+- add wifi firmware
+- bump misc userland
+- check for open issues
+- FIX BUGS!

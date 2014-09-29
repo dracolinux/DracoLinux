@@ -1,0 +1,46 @@
+make -f Makefile-libbz2_so || exit 1
+make || exit 1
+mkdir -p $DRACOSRC_PKG/usr/include
+cp -a bzlib.h $DRACOSRC_PKG/usr/include || exit 1
+chown root:root $DRACOSRC_PKG/usr/include/bzlib.h
+chmod 644 $DRACOSRC_PKG/usr/include/bzlib.h
+mkdir -p $DRACOSRC_PKG/usr/lib
+cp -a libbz2.a $DRACOSRC_PKG/usr/lib/libbz2.a || exit 1
+mkdir -p $DRACOSRC_PKG/lib
+cp -a libbz2.so.$DRACOSRC_PKG_VERSION $DRACOSRC_PKG/lib/libbz2.so.$DRACOSRC_PKG_VERSION || exit 1
+chmod 644 $DRACOSRC_PKG/usr/lib/libbz2.a
+chmod 755 $DRACOSRC_PKG/lib/libbz2.so.$DRACOSRC_PKG_VERSION
+mkdir -p $DRACOSRC_PKG/bin
+cat bzip2-shared > $DRACOSRC_PKG/bin/bzip2
+cat bzip2recover > $DRACOSRC_PKG/bin/bzip2recover
+mkdir -p $DRACOSRC_PKG/usr/man/man1
+cat bzip2.1 | gzip -9c > $DRACOSRC_PKG/usr/man/man1/bzip2.1.gz
+echo '.so man1/bzip2.1' | gzip -9c > $DRACOSRC_PKG/usr/man/man1/bzip2recover.1.gz
+
+( cd $DRACOSRC_PKG ;
+  ( cd lib ;
+    rm -f libbz2.so.1.0 libbz2.so.1
+    ln -sf libbz2.so.1.0.6 libbz2.so.1.0
+    ln -sf libbz2.so.1.0 libbz2.so.1
+  )
+  ( cd usr/lib ; ln -sf ../../lib/libbz2.so.1 libbz2.so )
+  ( cd bin ; ln -sf bzip2 bunzip2 )
+  ( cd bin ; ln -sf bzip2 bzcat )
+  mkdir -p usr/bin
+  ( cd usr/bin ;
+    ln -sf ../../bin/bzip2 bzip2
+    ln -sf ../../bin/bzip2 bunzip2
+    ln -sf ../../bin/bzip2 bzcat
+    ln -sf bzmore bzless
+  )
+)
+
+for file in bzdiff bzgrep bzmore ; do
+  cat $file > $DRACOSRC_PKG/usr/bin/$file
+  cat ${file}.1 | gzip -9c > $DRACOSRC_PKG/usr/man/man1/${file}.1.gz
+done
+
+
+chmod +x $DRACOSRC_PKG/bin/*
+chmod +x $DRACOSRC_PKG/usr/bin/*
+

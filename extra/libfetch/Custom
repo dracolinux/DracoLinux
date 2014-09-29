@@ -1,0 +1,7 @@
+CFLAGS="$DRACOSRC_FLAGS" bmake || exit 1
+mkdir -p $DRACOSRC_PKG/usr/lib $DRACOSRC_PKG/usr/include || exit 1
+cat libfetch.a > $DRACOSRC_PKG/usr/lib/libfetch.a || exit 1
+cat fetch.h > $DRACOSRC_PKG/usr/include/fetch.h || exit 1
+cat ftperr.h > $DRACOSRC_PKG/usr/include/ftperr.h || exit 1
+cat httperr.h > $DRACOSRC_PKG/usr/include/httperr.h || exit 1
+

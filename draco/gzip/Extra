@@ -1,0 +1,6 @@
+mkdir -p $DRACOSRC_PKG/usr/bin || exit 1
+( cd $DRACOSRC_PKG/bin
+  for file in * ; do
+    ( cd $DRACOSRC_PKG/usr/bin ; ln -sf ../../bin/$file . )
+  done
+)

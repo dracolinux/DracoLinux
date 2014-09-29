@@ -1,0 +1,4 @@
+
+make SUB="rsh rcp rlogin" || exit 1
+
+

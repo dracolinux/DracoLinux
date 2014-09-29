@@ -1,0 +1,67 @@
+#
+# Default mk.conf for Draco GNU/Linux
+#
+
+LOCALBASE=/usr/local
+PKG_SYSCONFBASE=${LOCALBASE}/etc
+PKG_DBDIR=/var/db/pkg
+VARBASE=${LOCALBASE}/var
+DISTDIR=${PKGSRCDIR}/distfiles
+PACKAGES=${PKGSRCDIR}/packages
+
+PKGSRCDIR=/usr/pkgsrc
+
+PKG_TOOLS_BIN=/usr/sbin
+FETCH_CMD=/bin/ftp
+TOOLS_PLATFORM.pax?= /usr/bin/pax
+TOOLS_PLATFORM.tar?= /usr/bin/bsdtar
+
+PKG_RCD_SCRIPTS=YES
+RCD_SCRIPTS_DIR=${PKG_SYSCONFBASE}/rc.d
+
+LOWER_VENDOR=draco
+LOWER_OS_VERSION=${OS_VERSION}
+CFLAGS+= -O2 -pipe -march=i486 -mtune=i686
+DBG=
+
+MASTER_SITE_OVERRIDE+=ftp://ftp.de.netbsd.org/pub/NetBSD/packages/distfiles/
+MASTER_SITE_OVERRIDE+=ftp://ftp.fi.netbsd.org/pub/NetBSD/packages/distfiles/
+MASTER_SITE_OVERRIDE+=ftp://ftp.at.netbsd.org/pub/NetBSD/packages/distfiles/
+MASTER_SITE_OVERRIDE+=http://pkgsrc-linux.org/pub/distfiles/
+MASTER_SITE_OVERRIDE+=ftp://ftp.netbsd.org/pub/NetBSD/packages/distfiles/
+MASTER_SITE_SOURCEFORGE+=http://switch.dl.sourceforge.net/sourceforge/
+MASTER_SITE_SOURCEFORGE+=http://ovh.dl.sourceforge.net/sourceforge/
+MASTER_SITE_SOURCEFORGE+=http://heanet.dl.sourceforge.net/sourceforge/
+MASTER_SITE_SOURCEFORGE+=http://belnet.dl.sourceforge.net/sourceforge/
+
+BINPKG_SITES+=${PKGSRCDIR}/packages
+BINPKG_SITES+=http://pkgsrc-linux.org/pub/packages
+BIN_INSTALL_FLAGS=-v
+DEPENDS_TARGET=bin-install
+
+MKMANZ=YES
+MKGDB=NO
+MKHTML=NO
+MKINFO=YES
+
+USA_RESIDENT=NO
+WITH_DVDCSS=YES
+
+X11_TYPE=modular
+
+#DEPENDS_TARGET=package
+#CHECK_FILES=YES
+#CHECK_INTERPRETER=YES
+#PKG_DEVELOPER?=YES
+
+_ACCEPTABLE=YES
+ALLOW_VULNERABLE_PACKAGES=YES
+#FAILOVER_FETCH=YES
+#PKG_RESUME_TRANSFERS=YES
+CLEANDEPENDS=YES
+
+GNU_PROGRAM_PREFIX=
+
+PKG_DEFAULT_OPTIONS=-nas -arts -esound -sdl -mplayer-win32 -mplayer-real cups samba dri subpixel truetype gnome kde xft dv
+PKG_OPTIONS.ffmpeg-snapshot=a52 faac faad gsm i686 libogg mp3lame old-dist theora vorbis x264 xvid
+PKG_OPTIONS.MesaLib=3dnow mmx sse x86 dri-i810 dri-i915 dri-i965 dri-mach64 dri-mga dri-r128 dri-r200 dri-r300 dri-radeon dri-savage dri-sis dri-tdfx dri-unichrome

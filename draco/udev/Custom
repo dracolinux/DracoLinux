@@ -1,0 +1,13 @@
+# udev requires glib now, since I don't want to include glib in DracoLinux, we just make a static version for udev.
+mkdir -p $DRACOSRC_PKG_WORK/glib
+(cd $DRACOSRC_PKG_WORK;
+  tar xfJ $DRACOSRC_CACHE/glib-$DRACOSRC_GLIB.tar.xz
+  cd glib-$DRACOSRC_GLIB
+  CFLAGS="$DRACOSRC_FLAGS" CXXFLAGS="$DRACOSRC_FLAGS" ./configure --prefix=$DRACOSRC_PKG_WORK/glib --enable-static --disable-shared --disable-gtk-doc --build=$DRACOSRC_ARCH-draco-linux
+  make -j3
+  make install
+)
+
+PKG_CONFIG_PATH="$DRACOSRC_PKG_WORK/glib/lib/pkgconfig" CFLAGS="$DRACOSRC_FLAGS" CXXFLAGS="$DRACOSRC_FLAGS" ./configure $DRACOSRC_PKG_CONFIGURE --build=$DRACOSRC_ARCH-draco-linux || exit 1
+make -j2 || exit 1
+make DESTDIR=$DRACOSRC_PKG install || exit 1

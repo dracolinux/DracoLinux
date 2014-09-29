@@ -1,0 +1,16 @@
+
+Draco GNU/Linux Help
+____________________
+
+PGDN/SPACE     - Move down one page
+PGUP/'b'       - Move up one page
+ENTER/DOWN/'j' - Move down one line
+UP/'k'         - Move up one line
+LEFT/'h'       - Scroll left
+RIGHT/'l'      - Scroll right
+'0'            - Move to beginning of line
+HOME/'g'       - Move to beginning of file
+END/'G'        - Move to end of file
+'/'            - Forward search
+'?'            - Backward search 
+'n'            - Repeat last search (forward) 

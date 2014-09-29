@@ -1,0 +1,3 @@
+CFLAGS="$DRACOSRC_FLAGS" CXXFLAGS="$DRACOSRC_FLAGS" make PREFIX=/usr || exit 1
+mkdir -p $DRACOSRC_PKG/usr/bin $DRACOSRC_PKG/usr/man/man1
+make PREFIX=$DRACOSRC_PKG/usr install || exit 1

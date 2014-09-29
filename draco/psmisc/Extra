@@ -1,0 +1,8 @@
+
+( cd $DRACOSRC_PKG; 
+  mkdir bin
+  mv usr/bin/killall bin/
+  ( cd usr/bin; ln -sf ../../bin/killall killall )
+  mv usr/share/man usr/
+)
+

@@ -1,0 +1,15 @@
+CFLAGS="$DRACOSRC_FLAGS" CXXFLAGS="$DRACOSRC_FLAGS" make || exit 1
+strip acpid   
+mkdir -p $DRACOSRC_PKG/usr/sbin $DRACOSRC_PKG/usr/bin
+cat acpid > $DRACOSRC_PKG/usr/sbin/acpid || exit 1
+cat acpi_listen > $DRACOSRC_PKG/usr/bin/acpi_listen || exit 1
+chmod 755 $DRACOSRC_PKG/usr/sbin/acpid $DRACOSRC_PKG/usr/bin/acpi_listen
+mkdir -p $DRACOSRC_PKG/usr/man/man8     
+cat acpid.8 | gzip -9c > $DRACOSRC_PKG/usr/man/man8/acpid.8.gz
+mkdir -p $DRACOSRC_PKG/etc/acpi/events
+cat $DRACOSRC_PKG_SRC_DIR/acpi_handler.sh > $DRACOSRC_PKG/etc/acpi/acpi_handler.sh
+chmod 755 $DRACOSRC_PKG/etc/acpi/acpi_handler.sh
+cat $DRACOSRC_PKG_SRC_DIR/default > $DRACOSRC_PKG/etc/acpi/events/default
+mkdir -p $DRACOSRC_PKG/etc/rc.d
+cat $DRACOSRC_PKG_SRC_DIR/rc.acpid > $DRACOSRC_PKG/etc/rc.d/rc.acpid
+chmod 755 $DRACOSRC_PKG/etc/rc.d/rc.acpid

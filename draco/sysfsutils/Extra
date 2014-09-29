@@ -1,0 +1,13 @@
+
+rm $DRACOSRC_PKG/lib/*.la || exit 1
+rm $DRACOSRC_PKG/lib/*.so || exit 1
+
+mkdir -p $DRACOSRC_PKG/usr/lib || exit 1
+
+if [ ! -L $DRACOSRC_PKG/lib/libsysfs.so.2 ]; then
+  exit 1
+fi
+
+( cd $DRACOSRC_PKG/usr/lib ; ln -sf ../../lib/libsysfs.so.2 libsysfs.so )
+
+

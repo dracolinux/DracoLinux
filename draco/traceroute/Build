@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="traceroute"
+DRACOSRC_PKG_VERSION="1.4a12"
+DRACOSRC_PKG_BUILD=5
+DRACOSRC_PKG_DESC="IP packet route tracing utillity"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr"

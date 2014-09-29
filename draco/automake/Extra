@@ -1,0 +1,8 @@
+
+( cd $DRACOSRC_PKG/usr/bin
+  rm -f aclocal  
+  ln -sf aclocal-$DRACOSRC_PKG_SHORT_VERSION aclocal
+  rm -rf automake
+  ln -sf automake-$DRACOSRC_PKG_SHORT_VERSION automake
+)
+mkdir -p $DRACOSRC_PKG/usr/share/aclocal || exit 1

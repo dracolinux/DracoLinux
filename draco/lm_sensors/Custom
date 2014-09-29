@@ -1,0 +1,10 @@
+
+make PREFIX=/usr user || exit 1
+make user_install PREFIX=/usr DESTDIR=$DRACOSRC_PKG || exit 1
+
+rm -rf $DRACOSRC_PKG/usr/lib/*.a
+rm -rf $DRACOSRC_PKG/usr/include/linux
+
+( cd $DRACOSRC_PKG/etc ;
+  mv sensors3.conf sensors3.conf.new
+)

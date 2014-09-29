@@ -1,0 +1,100 @@
+# Default pkgsrc mk.conf for DracoLinux 0.4.
+# Please review this file before using pkgsrc.
+
+.ifdef BSD_PKG_MK
+
+# Where pkgsrc will install packages.
+PKG_DBDIR=		/var/db/pkg
+LOCALBASE=		/usr/pkg
+VARBASE=		/var
+PKGMANDIR=		man
+
+# Path to pkg_* tools, only change if you manually bootstrap pkgsrc (you should probably not use this file anyway then).
+PKG_TOOLS_BIN=		/usr/sbin
+
+# DracoLinux includes tnftp, use that.
+FETCH_USING=custom
+FETCH_BEFORE_ARGS=         ${PASSIVE_FETCH:D-p} \
+                           ${FETCH_TIMEOUT:D-q ${FETCH_TIMEOUT}} \
+                           ${FETCH_USE_IPV4_ONLY:D-4}
+FETCH_AFTER_ARGS=          # empty
+FETCH_RESUME_ARGS=         -R
+FETCH_OUTPUT_ARGS=         -o
+FETCH_CMD=                 /bin/ftp
+
+# Include rc.d scripts and install them in /etc/rc.d.
+PKG_RCD_SCRIPTS=YES
+RCD_SCRIPTS_DIR=/etc/rc.d
+
+# Force DracoLinux as vendor.
+LOWER_VENDOR=draco
+
+# Force DracoLinux version, only compatible with DracoLinux pkg_install.
+# Why? pkgsrc compares kernel version when building/installing packages, this works for the BSDs, but not in Linux.
+# If the user changes kernel compared to the build server, pkg_add will complain that the pkg vs. host don't match.
+# To avoid this we hardcode DracoLinux release in mk.conf and in the pkg_add source.
+OS_VERSION=0.4
+
+# DracoLinux is i486.
+MACHINE_GNU_ARCH=i486
+
+# Default compiler flags for bulk builds, not enabled as default.
+#CFLAGS+= -march=i486 -mtune=i686
+#CFLAGS+= -O2 -pipe
+DBG=
+
+# Speed up compile time, adjust according to CPU (cores).
+MAKE_JOBS=3
+
+# Use GCC from pkgsrc.
+#USE_PKGSRC_GCC=y
+#GCC_REQD=4.4
+
+# Mirror overrides, adjust according to location/speed.
+MASTER_SITE_OVERRIDE+=ftp://ftp.fi.netbsd.org/pub/NetBSD/packages/distfiles/
+MASTER_SITE_SOURCEFORGE+=http://switch.dl.sourceforge.net/sourceforge/
+
+# Include MAN(z) and INFO documentation, ignore GDB and HTML.
+MKMANZ=YES
+MKGDB=NO
+MKHTML=NO
+MKINFO=YES
+
+# Ignore restrictions.
+USA_RESIDENT=NO
+WITH_DVDCSS=YES
+
+# Use modular X.org from pkgsrc.
+X11_TYPE=modular
+
+# Check/verify packages for errors, recommended but may break stuff for normal users.
+PKG_DEVELOPER?=NO
+
+# Ignore package license.
+SKIP_LICENSE_CHECK=yes
+
+# Ignore vulnerabilities.
+ALLOW_VULNERABLE_PACKAGES=YES
+
+# Resume transfer.
+FAILOVER_FETCH=YES
+
+# Don't add a prefix to gnu programs.
+GNU_PROGRAM_PREFIX=
+
+# Use Gamin as default FAM.
+FAM_DEFAULT=gamin
+
+# Prefer pkgsrc depends when building packages, avoid including conflicts from DracoLinux.
+# This will add some "bloat", but less packages will break.
+PREFER_PKGSRC=yes
+PREFER_NATIVE=ncurses iconv getopt
+
+# Some sane defaults for packages, adjust according to needs.
+# Audio wrappers should not be used, we use OSS that does mixing etc.
+PKG_DEFAULT_OPTIONS=-aalib -sdl -nas -arts -esound -pulseaudio cups samba dri subpixel truetype xft
+PKG_OPTIONS.fluxbox=nls xrender gnome kde
+PKG_OPTIONS.mplayer=-mplayer-real -mplayer-win32
+
+.endif
+

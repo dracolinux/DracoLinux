@@ -1,0 +1,1 @@
+(cd $DRACOSRC_PKG/usr/sbin ; patch -p0 < $DRACOSRC_PKG_SRC_DIR/typo.diff)

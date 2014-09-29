@@ -1,0 +1,28 @@
+
+CFLAGS="$DRACOSRC_CFLAGS" make KERNEL_INCLUDE=/usr/include || exit 1
+
+EXE="arping clockdiff ping ping6 rarpd rdisc tracepath tracepath6 traceroute6"
+
+strip $EXE
+
+mkdir -p $DRACOSRC_PKG/{sbin,bin,usr/sbin,usr/bin,usr/man/man8} || exit 1
+
+cat arping > $DRACOSRC_PKG/sbin/arping || exit 1
+cat clockdiff > $DRACOSRC_PKG/usr/sbin/clockdiff || exit 1
+cat ping > $DRACOSRC_PKG/bin/ping || exit 1
+cat ping6 > $DRACOSRC_PKG/bin/ping6 || exit 1
+cat rarpd > $DRACOSRC_PKG/usr/sbin/rarpd || exit 1
+cat rdisc > $DRACOSRC_PKG/usr/sbin/rdisc || exit 1
+cat tracepath > $DRACOSRC_PKG/usr/bin/tracepath || exit 1
+cat tracepath6 > $DRACOSRC_PKG/usr/bin/tracepath6 || exit 1
+cat traceroute6 > $DRACOSRC_PKG/usr/bin/traceroute6 || exit 1
+
+chmod 755 $DRACOSRC_PKG/{bin,sbin,usr/bin,usr/sbin}/*
+chmod 4711 $DRACOSRC_PKG/bin/ping* $DRACOSRC_PKG/usr/bin/traceroute*
+
+cp $DRACOSRC_PKG_SRC_DIR/*.8* $DRACOSRC_PKG/usr/man/man8/
+
+( cd $DRACOSRC_PKG/usr/man/man8 ; 
+  ln -sf ping.8.gz ping6.8
+  ln -sf tracepath.8.gz tracepath6.8
+)

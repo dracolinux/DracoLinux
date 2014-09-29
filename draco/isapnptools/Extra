@@ -1,0 +1,5 @@
+
+mkdir -p $DRACOSRC_PKG/etc
+cat etc/isapnp.conf > $DRACOSRC_PKG/etc/isapnp.conf.sample || exit 1
+cat etc/isapnp.gone > $DRACOSRC_PKG/etc/isapnp.gone.sample || exit 1
+

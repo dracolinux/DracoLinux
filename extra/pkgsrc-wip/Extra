@@ -1,0 +1,3 @@
+mkdir -p $DRACOSRC_PKG/usr/pkgsrc || exit 1
+( cd $DRACOSRC_PKG/usr/pkgsrc ; tar xvJf $DRACOSRC_CACHE/pkgsrc-wip-$DRACOSRC_PKG_VERSION-snapshot.tar.xz )
+chown root:root -R $DRACOSRC_PKG/usr/pkgsrc

@@ -1,0 +1,78 @@
+cp $DRACOSRC_DIR/common/linux30/logo_linux_clut224.ppm drivers/video/logo/ || exit 1
+
+if [ -f $DRACOSRC_DIR/common/linux30/$KERNEL_CONFIG ]; then
+  cat $DRACOSRC_DIR/common/linux30/$KERNEL_CONFIG >.config || exit 1
+else
+  echo "=> * Kernel config not found"
+  exit 1
+fi
+
+if [ $DRACOSRC_PKG_KERNEL_PATCH ]; then
+  if [ -f $DRACOSRC_CACHE/patch-$DRACOSRC_PKG_KERNEL_PATCH.xz ]; then
+    xzcat $DRACOSRC_CACHE/patch-$DRACOSRC_PKG_KERNEL_PATCH.xz | patch -p1 || exit 1 
+  fi
+  #sed -i 's/EXTRAVERSION = '${DRACOSRC_PKG_KERNEL_PATCH}'/EXTRAVERSION = /g' Makefile || exit 1
+fi
+
+#make oldconfig
+
+if [ "${NOMAKE}" = 1 ]; then
+  echo "=> Build aborted"
+  exit 1
+fi
+
+make -j6 bzImage modules || exit 1
+
+mkdir -p $DRACOSRC_PKG/{lib/modules,boot} || exit 1
+make INSTALL_MOD_PATH=$DRACOSRC_PKG modules_install || exit 1
+cp System.map $DRACOSRC_PKG/boot/System.map-${DRACOSRC_PKG_VERSION}$LOCAL_KERNEL || exit 1
+cp arch/x86/boot/bzImage $DRACOSRC_PKG/boot/vmlinuz-${DRACOSRC_PKG_VERSION}$LOCAL_KERNEL || exit
+cp .config $DRACOSRC_PKG/boot/config-${DRACOSRC_PKG_VERSION}$LOCAL_KERNEL || exit 1
+
+( cd $DRACOSRC_PKG/boot ;
+  ln -sf System.map-${DRACOSRC_PKG_VERSION}$LOCAL_KERNEL System.map
+  ln -sf vmlinuz-${DRACOSRC_PKG_VERSION}$LOCAL_KERNEL vmlinuz
+  ln -sf config-${DRACOSRC_PKG_VERSION}$LOCAL_KERNEL config
+)
+
+mkdir -p $DRACOSRC_PKG/install || exit 1
+cat << EOF > $DRACOSRC_PKG/install/doinst.sh
+if [ -x sbin/depmod ]; then
+  chroot . /sbin/depmod -a ${DRACOSRC_PKG_VERSION}$LOCAL_KERNEL 1> /dev/null 2> /dev/null
+fi
+
+EOF
+
+make clean
+rm .version
+make oldconfig
+make prepare
+make scripts
+
+mkdir tmp || exit 1
+mv net/mac80211 tmp/ || exit 1
+mv drivers/net/wireless tmp/ || exit 1
+rm -Rf Documentation drivers fs net sound || exit 1
+ls -1d arch/* | grep -v x86 | xargs rm -Rf || exit 1
+ls -1d include/* | grep asm- | grep -v i386 | grep -v x86 | grep -v generic | xargs rm -Rf || exit 1
+
+mkdir -p net drivers/net || exit 1
+mv tmp/mac80211 net/ || exit 1
+mv tmp/wireless drivers/net/ || exit 1
+rm -r tmp || exit 1
+
+cd .. || exit 1
+
+mkdir -p $DRACOSRC_PKG/usr/src || exit 1
+mv linux-${DRACOSRC_PKG_ALT_VERSION} $DRACOSRC_PKG/usr/src/linux-${DRACOSRC_PKG_VERSION}$LOCAL_KERNEL || exit 1
+
+( cd $DRACOSRC_PKG/usr/src ; 
+  ln -sf linux-${DRACOSRC_PKG_VERSION}$LOCAL_KERNEL linux
+)
+
+( cd $DRACOSRC_PKG/lib/modules/$DRACOSRC_PKG_VERSION${LOCAL_KERNEL} ;
+  ( rm -f source build;
+    ln -sf ../../../usr/src/linux-$DRACOSRC_PKG_VERSION${LOCAL_KERNEL} build
+    ln -sf ../../../usr/src/linux-$DRACOSRC_PKG_VERSION${LOCAL_KERNEL} source
+  )
+)

@@ -1,0 +1,155 @@
+--- Makefile.am.orig	2012-12-21 08:58:45.035206348 +0100
++++ Makefile.am	2012-12-21 08:59:16.037819184 +0100
+@@ -301,14 +301,6 @@
+ extras_usb_id_usb_id_LDADD = libudev/libudev-private.la
+ libexec_PROGRAMS += extras/usb_id/usb_id
+ 
+-# ------------------------------------------------------------------------------
+-# v4l_id - video4linux capabilities
+-# ------------------------------------------------------------------------------
+-extras_v4l_id_v4l_id_SOURCES = extras/v4l_id/v4l_id.c
+-extras_v4l_id_v4l_id_LDADD = libudev/libudev-private.la
+-libexec_PROGRAMS += extras/v4l_id/v4l_id
+-dist_udevrules_DATA += extras/v4l_id/60-persistent-v4l.rules
+-
+ if ENABLE_EXTRAS
+ # ------------------------------------------------------------------------------
+ # conditional extras (need glib, libusb, libacl, ...)
+--- Makefile.in.orig	2012-12-21 08:59:30.983632228 +0100
++++ Makefile.in	2012-12-21 09:02:38.280290384 +0100
+@@ -55,8 +55,7 @@
+ 	extras/input_id/input_id$(EXEEXT) \
+ 	extras/path_id/path_id$(EXEEXT) \
+ 	extras/fstab_import/fstab_import$(EXEEXT) \
+-	extras/scsi_id/scsi_id$(EXEEXT) extras/usb_id/usb_id$(EXEEXT) \
+-	extras/v4l_id/v4l_id$(EXEEXT) $(am__EXEEXT_1)
++	extras/scsi_id/scsi_id$(EXEEXT) extras/usb_id/usb_id$(EXEEXT)
+ 
+ # ------------------------------------------------------------------------------
+ # conditional extras (need glib, libusb, libacl, ...)
+@@ -328,9 +327,6 @@
+ am_extras_usb_id_usb_id_OBJECTS = extras/usb_id/usb_id.$(OBJEXT)
+ extras_usb_id_usb_id_OBJECTS = $(am_extras_usb_id_usb_id_OBJECTS)
+ extras_usb_id_usb_id_DEPENDENCIES = libudev/libudev-private.la
+-am_extras_v4l_id_v4l_id_OBJECTS = extras/v4l_id/v4l_id.$(OBJEXT)
+-extras_v4l_id_v4l_id_OBJECTS = $(am_extras_v4l_id_v4l_id_OBJECTS)
+-extras_v4l_id_v4l_id_DEPENDENCIES = libudev/libudev-private.la
+ am_libudev_test_libudev_OBJECTS = libudev/test-libudev.$(OBJEXT)
+ libudev_test_libudev_OBJECTS = $(am_libudev_test_libudev_OBJECTS)
+ libudev_test_libudev_DEPENDENCIES = libudev/libudev.la
+@@ -402,7 +398,6 @@
+ 	$(extras_usb_db_pci_db_SOURCES) \
+ 	$(extras_usb_db_usb_db_SOURCES) \
+ 	$(extras_usb_id_usb_id_SOURCES) \
+-	$(extras_v4l_id_v4l_id_SOURCES) \
+ 	$(libudev_test_libudev_SOURCES) $(udev_test_udev_SOURCES) \
+ 	$(udev_udevadm_SOURCES) $(udev_udevd_SOURCES)
+ DIST_SOURCES = $(am__extras_gudev_libgudev_1_0_la_SOURCES_DIST) \
+@@ -426,7 +421,6 @@
+ 	$(am__extras_usb_db_pci_db_SOURCES_DIST) \
+ 	$(am__extras_usb_db_usb_db_SOURCES_DIST) \
+ 	$(extras_usb_id_usb_id_SOURCES) \
+-	$(extras_v4l_id_v4l_id_SOURCES) \
+ 	$(libudev_test_libudev_SOURCES) $(udev_test_udev_SOURCES) \
+ 	$(udev_udevadm_SOURCES) $(udev_udevd_SOURCES)
+ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
+@@ -511,7 +505,6 @@
+ 	extras/edd_id/61-persistent-storage-edd.rules \
+ 	extras/floppy/60-floppy.rules \
+ 	extras/fstab_import/79-fstab_import.rules \
+-	extras/v4l_id/60-persistent-v4l.rules \
+ 	rules/rules.d/75-net-description.rules \
+ 	rules/rules.d/75-tty-description.rules \
+ 	rules/rules.d/78-sound-card.rules \
+@@ -791,8 +784,7 @@
+ 	extras/cdrom_id/60-cdrom_id.rules \
+ 	extras/edd_id/61-persistent-storage-edd.rules \
+ 	extras/floppy/60-floppy.rules \
+-	extras/fstab_import/79-fstab_import.rules \
+-	extras/v4l_id/60-persistent-v4l.rules $(am__append_3)
++	extras/fstab_import/79-fstab_import.rules $(am__append_3)
+ udevconfdir = $(sysconfdir)/udev
+ dist_udevconf_DATA = udev.conf
+ sharepkgconfigdir = $(datadir)/pkgconfig
+@@ -927,12 +919,6 @@
+ extras_usb_id_usb_id_LDADD = libudev/libudev-private.la
+ 
+ # ------------------------------------------------------------------------------
+-# v4l_id - video4linux capabilities
+-# ------------------------------------------------------------------------------
+-extras_v4l_id_v4l_id_SOURCES = extras/v4l_id/v4l_id.c
+-extras_v4l_id_v4l_id_LDADD = libudev/libudev-private.la
+-
+-# ------------------------------------------------------------------------------
+ # GUdev - libudev gobject interface
+ # ------------------------------------------------------------------------------
+ @ENABLE_EXTRAS_TRUE@LIBGUDEV_CURRENT = 1
+@@ -1593,17 +1579,6 @@
+ extras/usb_id/usb_id$(EXEEXT): $(extras_usb_id_usb_id_OBJECTS) $(extras_usb_id_usb_id_DEPENDENCIES) extras/usb_id/$(am__dirstamp)
+ 	@rm -f extras/usb_id/usb_id$(EXEEXT)
+ 	$(AM_V_CCLD)$(LINK) $(extras_usb_id_usb_id_OBJECTS) $(extras_usb_id_usb_id_LDADD) $(LIBS)
+-extras/v4l_id/$(am__dirstamp):
+-	@$(MKDIR_P) extras/v4l_id
+-	@: > extras/v4l_id/$(am__dirstamp)
+-extras/v4l_id/$(DEPDIR)/$(am__dirstamp):
+-	@$(MKDIR_P) extras/v4l_id/$(DEPDIR)
+-	@: > extras/v4l_id/$(DEPDIR)/$(am__dirstamp)
+-extras/v4l_id/v4l_id.$(OBJEXT): extras/v4l_id/$(am__dirstamp) \
+-	extras/v4l_id/$(DEPDIR)/$(am__dirstamp)
+-extras/v4l_id/v4l_id$(EXEEXT): $(extras_v4l_id_v4l_id_OBJECTS) $(extras_v4l_id_v4l_id_DEPENDENCIES) extras/v4l_id/$(am__dirstamp)
+-	@rm -f extras/v4l_id/v4l_id$(EXEEXT)
+-	$(AM_V_CCLD)$(LINK) $(extras_v4l_id_v4l_id_OBJECTS) $(extras_v4l_id_v4l_id_LDADD) $(LIBS)
+ libudev/test-libudev.$(OBJEXT): libudev/$(am__dirstamp) \
+ 	libudev/$(DEPDIR)/$(am__dirstamp)
+ libudev/test-libudev$(EXEEXT): $(libudev_test_libudev_OBJECTS) $(libudev_test_libudev_DEPENDENCIES) libudev/$(am__dirstamp)
+@@ -1721,7 +1696,6 @@
+ 	-rm -f extras/usb-db/extras_usb_db_pci_db-usb-db.$(OBJEXT)
+ 	-rm -f extras/usb-db/extras_usb_db_usb_db-usb-db.$(OBJEXT)
+ 	-rm -f extras/usb_id/usb_id.$(OBJEXT)
+-	-rm -f extras/v4l_id/v4l_id.$(OBJEXT)
+ 	-rm -f libudev/libudev-ctrl.$(OBJEXT)
+ 	-rm -f libudev/libudev-ctrl.lo
+ 	-rm -f libudev/libudev-device-private.$(OBJEXT)
+@@ -1792,7 +1766,6 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@extras/usb-db/$(DEPDIR)/extras_usb_db_pci_db-usb-db.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@extras/usb-db/$(DEPDIR)/extras_usb_db_usb_db-usb-db.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@extras/usb_id/$(DEPDIR)/usb_id.Po@am__quote@
+-@AMDEP_TRUE@@am__include@ @am__quote@extras/v4l_id/$(DEPDIR)/v4l_id.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@libudev/$(DEPDIR)/libudev-ctrl.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@libudev/$(DEPDIR)/libudev-device-private.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@libudev/$(DEPDIR)/libudev-device.Plo@am__quote@
+@@ -2087,7 +2060,6 @@
+ 	-rm -rf extras/udev-acl/.libs extras/udev-acl/_libs
+ 	-rm -rf extras/usb-db/.libs extras/usb-db/_libs
+ 	-rm -rf extras/usb_id/.libs extras/usb_id/_libs
+-	-rm -rf extras/v4l_id/.libs extras/v4l_id/_libs
+ 	-rm -rf libudev/.libs libudev/_libs
+ 	-rm -rf udev/.libs udev/_libs
+ 
+@@ -2923,8 +2895,6 @@
+ 	-rm -f extras/usb-db/$(am__dirstamp)
+ 	-rm -f extras/usb_id/$(DEPDIR)/$(am__dirstamp)
+ 	-rm -f extras/usb_id/$(am__dirstamp)
+-	-rm -f extras/v4l_id/$(DEPDIR)/$(am__dirstamp)
+-	-rm -f extras/v4l_id/$(am__dirstamp)
+ 	-rm -f libudev/$(DEPDIR)/$(am__dirstamp)
+ 	-rm -f libudev/$(am__dirstamp)
+ 	-rm -f udev/$(DEPDIR)/$(am__dirstamp)
+@@ -2942,7 +2912,7 @@
+ 
+ distclean: distclean-recursive
+ 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
+-	-rm -rf extras/ata_id/$(DEPDIR) extras/cdrom_id/$(DEPDIR) extras/collect/$(DEPDIR) extras/edd_id/$(DEPDIR) extras/firmware/$(DEPDIR) extras/floppy/$(DEPDIR) extras/fstab_import/$(DEPDIR) extras/gudev/$(DEPDIR) extras/hid2hci/$(DEPDIR) extras/input_id/$(DEPDIR) extras/keymap/$(DEPDIR) extras/mobile-action-modeswitch/$(DEPDIR) extras/mtd_probe/$(DEPDIR) extras/path_id/$(DEPDIR) extras/scsi_id/$(DEPDIR) extras/udev-acl/$(DEPDIR) extras/usb-db/$(DEPDIR) extras/usb_id/$(DEPDIR) extras/v4l_id/$(DEPDIR) libudev/$(DEPDIR) udev/$(DEPDIR)
++	-rm -rf extras/ata_id/$(DEPDIR) extras/cdrom_id/$(DEPDIR) extras/collect/$(DEPDIR) extras/edd_id/$(DEPDIR) extras/firmware/$(DEPDIR) extras/floppy/$(DEPDIR) extras/fstab_import/$(DEPDIR) extras/gudev/$(DEPDIR) extras/hid2hci/$(DEPDIR) extras/input_id/$(DEPDIR) extras/keymap/$(DEPDIR) extras/mobile-action-modeswitch/$(DEPDIR) extras/mtd_probe/$(DEPDIR) extras/path_id/$(DEPDIR) extras/scsi_id/$(DEPDIR) extras/udev-acl/$(DEPDIR) extras/usb-db/$(DEPDIR) extras/usb_id/$(DEPDIR) libudev/$(DEPDIR) udev/$(DEPDIR)
+ 	-rm -f Makefile
+ distclean-am: clean-am distclean-compile distclean-generic \
+ 	distclean-hdr distclean-libtool distclean-local distclean-tags
+@@ -2999,7 +2969,7 @@
+ maintainer-clean: maintainer-clean-recursive
+ 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
+ 	-rm -rf $(top_srcdir)/autom4te.cache
+-	-rm -rf extras/ata_id/$(DEPDIR) extras/cdrom_id/$(DEPDIR) extras/collect/$(DEPDIR) extras/edd_id/$(DEPDIR) extras/firmware/$(DEPDIR) extras/floppy/$(DEPDIR) extras/fstab_import/$(DEPDIR) extras/gudev/$(DEPDIR) extras/hid2hci/$(DEPDIR) extras/input_id/$(DEPDIR) extras/keymap/$(DEPDIR) extras/mobile-action-modeswitch/$(DEPDIR) extras/mtd_probe/$(DEPDIR) extras/path_id/$(DEPDIR) extras/scsi_id/$(DEPDIR) extras/udev-acl/$(DEPDIR) extras/usb-db/$(DEPDIR) extras/usb_id/$(DEPDIR) extras/v4l_id/$(DEPDIR) libudev/$(DEPDIR) udev/$(DEPDIR)
++	-rm -rf extras/ata_id/$(DEPDIR) extras/cdrom_id/$(DEPDIR) extras/collect/$(DEPDIR) extras/edd_id/$(DEPDIR) extras/firmware/$(DEPDIR) extras/floppy/$(DEPDIR) extras/fstab_import/$(DEPDIR) extras/gudev/$(DEPDIR) extras/hid2hci/$(DEPDIR) extras/input_id/$(DEPDIR) extras/keymap/$(DEPDIR) extras/mobile-action-modeswitch/$(DEPDIR) extras/mtd_probe/$(DEPDIR) extras/path_id/$(DEPDIR) extras/scsi_id/$(DEPDIR) extras/udev-acl/$(DEPDIR) extras/usb-db/$(DEPDIR) extras/usb_id/$(DEPDIR) libudev/$(DEPDIR) udev/$(DEPDIR)
+ 	-rm -f Makefile
+ maintainer-clean-am: distclean-am maintainer-clean-generic
+ 

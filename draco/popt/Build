@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="popt"
+DRACOSRC_PKG_VERSION="1.10.7"
+DRACOSRC_PKG_BUILD=6
+DRACOSRC_PKG_DESC="Command line parsing library"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --sysconfdir=/etc --mandir=/usr/man --program-prefix= --program-suffix= --build=$DRACOSRC_ARCH-draco-linux"

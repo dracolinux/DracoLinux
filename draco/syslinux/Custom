@@ -1,0 +1,4 @@
+
+make installer || exit 1
+make SBINDIR=$DRACOSRC_PKG/usr/sbin BINDIR=$DRACOSRC_PKG/usr/bin LIBDIR=$DRACOSRC_PKG/usr/lib INCDIR=$DRACOSRC_PKG/usr/include MANDIR=$DRACOSRC_PKG/usr/man install
+#install -m755 mkdiskimage $DRACOSRC_PKG/usr/bin/ || exit 1

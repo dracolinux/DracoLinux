@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="db"
+DRACOSRC_PKG_VERSION="4.5.20"
+DRACOSRC_PKG_BUILD=9
+DRACOSRC_PKG_DESC="Berkeley database library"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --enable-shared --enable-rpc --enable-cxx --enable-compat185"

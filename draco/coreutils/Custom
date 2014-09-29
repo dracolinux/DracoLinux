@@ -1,0 +1,81 @@
+cd $DRACOSRC_PKG_WORK/$DRACOSRC_PKG_NAME-$DRACOSRC_PKG_VERSION || exit 1
+cd coreutils || exit 1
+
+
+DEFAULT_POSIX2_VERSION=199209
+CFLAGS="$DRACOSRC_FLAGS" CXXFLAGS="DRACOSRC_CFLAGS" ./configure $DRACOSRC_PKG_CONFIGURE || exit 1
+make -j4 || exit 1
+make install DESTDIR=$DRACOSRC_PKG || exit 1
+
+
+( cd $DRACOSRC_PKG/usr/share/locale
+  rm -rf */LC_TIME
+)
+ 
+mkdir -p $DRACOSRC_PKG/usr/doc/coreutils-$DRACOSRC_PKG_VERSION $DRACOSRC_PKG/usr/bin $DRACOSRC_PKG/usr/sbin $DRACOSRC_PKG/bin $DRACOSRC_PKG/sbin || exit 1
+
+( cd $DRACOSRC_PKG/usr/bin;
+  for file in `ls ../../bin/` ; do
+    ln  --verbose -sf ../../bin/$file $file || exit 1
+  done
+)
+
+mv $DRACOSRC_PKG/bin/chroot $DRACOSRC_PKG/sbin/ || exit 1
+( cd $DRACOSRC_PKG/usr/sbin; ln -sf ../../sbin/chroot .)
+( cd $DRACOSRC_PKG/usr/bin; ln -sf ../../sbin/chroot .)
+
+mkdir -p $DRACOSRC_PKG/etc || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/DIR_COLORS > $DRACOSRC_PKG/etc/DIR_COLORS.new || exit 1
+
+mkdir -p $DRACOSRC_PKG/etc/profile.d || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/coreutils-dircolors.sh > $DRACOSRC_PKG/etc/profile.d/coreutils-dircolors.sh || exit 1
+chmod +x $DRACOSRC_PKG/etc/profile.d/*
+
+( cd $DRACOSRC_PKG;
+  for dupe in hostname kill su uptime ; do
+    rm -f bin/${dupe} usr/bin/${dupe} usr/sbin/${dupe} usr/man/man?/${dupe}.*
+  done
+)
+
+( cd $DRACOSRC_PKG/bin ; ln -sf install ginstall )
+( cd $DRACOSRC_PKG/usr/bin ; ln -sf ../../bin/ginstall ginstall )
+( cd $DRACOSRC_PKG/usr/man/man1 ; ln -sf install.1 ginstall.1 )
+
+echo "=> Building adjtimex ... "
+cd $DRACOSRC_PKG_WORK/$DRACOSRC_PKG_NAME-$DRACOSRC_PKG_VERSION/adjtimex || exit 1
+CFLAGS="$DRACOSRC_FLAGS" CXXFLAGS="$DRACOSRC_FLAGS" ./configure --prefix=/usr || exit 1
+make || exit 1
+strip -s adjtimex || exit 1
+mkdir -p $DRACOSRC_PKG/sbin
+cat adjtimex > $DRACOSRC_PKG/sbin/adjtimex || exit 1
+chmod 755 $DRACOSRC_PKG/sbin/adjtimex
+mkdir -p $DRACOSRC_PKG/usr/man/man8
+cat adjtimex.8 > $DRACOSRC_PKG/usr/man/man8/adjtimex.8 || exit 1
+
+echo "=> Building fbset ..."
+cd $DRACOSRC_PKG_WORK/$DRACOSRC_PKG_NAME-$DRACOSRC_PKG_VERSION/fbset || exit 1
+CFLAGS="$DRACOSRC_FLAGS" CXXFLAGS="$DRACOSRC_FLAGS" make || exit 1
+install -D -m755 fbset $DRACOSRC_PKG/sbin/fbset || exit 1
+install -D -m644 fbset.8 $DRACOSRC_PKG/usr/man/man8/fbset.8 || exit 1
+install -D -m644 fb.modes.5 $DRACOSRC_PKG/usr/man/man5/fb.modes.5 || exit 1
+install -D -m644 etc/fb.modes.ATI $DRACOSRC_PKG/etc/fb.modes || exit 1
+
+echo "=> Building tree ..."
+cd $DRACOSRC_PKG_WORK/$DRACOSRC_PKG_NAME-$DRACOSRC_PKG_VERSION/tree || exit 1
+CFLAGS="$DRACOSRC_FLAGS" CXXFLAGS="$DRACOSRC_FLAGS" make -j2 || exit 1
+mkdir -p $DRACOSRC_PKG/usr/bin
+cat tree > $DRACOSRC_PKG/bin/tree || exit 1
+chmod 755 $DRACOSRC_PKG/bin/tree || exit 1
+mkdir -p $DRACOSRC_PKG/usr/man/man1
+cat man/tree.1 > $DRACOSRC_PKG/usr/man/man1/tree.1 || exit 1
+
+echo "=> Building time ..."
+cd $DRACOSRC_PKG_WORK/$DRACOSRC_PKG_NAME-$DRACOSRC_PKG_VERSION/time || exit 1
+CFLAGS="${DRACOSRC_FLAGS}" CXXFLAGS="${DRACOSRC_FLAGS}" ./configure --prefix=/usr $DRACOSRC_ARCH-draco-linux || exit 1
+make || exit 1
+cat time > $DRACOSRC_PKG/bin/time || exit 1
+chmod 755 $DRACOSRC_PKG/bin/time || exit 1
+
+mkdir -p $DRACOSRC_PKG/usr/info
+cat time.info > $DRACOSRC_PKG/usr/info/time.info || exit 1
+

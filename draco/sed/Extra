@@ -1,0 +1,3 @@
+mkdir -p $DRACOSRC_PKG/bin || exit 1
+mv $DRACOSRC_PKG/usr/bin/sed $DRACOSRC_PKG/bin || exit 1
+( cd $DRACOSRC_PKG/usr/bin ; ln -sf /bin/sed . )

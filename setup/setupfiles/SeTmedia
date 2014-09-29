@@ -1,0 +1,35 @@
+#!/bin/sh
+TMP=/var/log/setup/tmp
+if [ ! -d $TMP ]; then
+  mkdir -p $TMP
+fi
+
+dialog --backtitle "Select Draco installation source." \
+--title "SOURCE MEDIA SELECTION" --menu \
+"Please select the media from which to install Draco:" \
+11 70 4 \
+"1" "Install from CD/DVD" \
+"2" "Install from HD/USB" \
+2> $TMP/media
+if [ ! $? = 0 ]; then
+ rm $TMP/media
+ exit
+fi
+
+SOURCE_MEDIA="`cat $TMP/media`"
+rm -f $TMP/media
+if [ "$SOURCE_MEDIA" = "1" ]; then
+ INSCD
+elif [ "$SOURCE_MEDIA" = "2" ]; then
+ INShd
+#elif [ "$SOURCE_MEDIA" = "3" ]; then
+# INSNFS
+#elif [ "$SOURCE_MEDIA" = "4" ]; then
+# INSdir 
+#elif [ "$SOURCE_MEDIA" = "5" ]; then
+# INSfd
+fi
+
+# Sorry, this goes the way of the dinosaur...
+#"5" "Install from floppy disks (A and N series only)" 
+

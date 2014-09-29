@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="jfsutils"
+DRACOSRC_PKG_VERSION=1.1.15
+DRACOSRC_PKG_BUILD=3
+DRACOSRC_PKG_DESC="IBM JFS utillities"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --disable-dependency-tracking $DRACOSRC_ARCH-draco-linux"

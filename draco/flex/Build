@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="flex"
+DRACOSRC_PKG_VERSION="2.5.35"
+DRACOSRC_PKG_BUILD=7
+DRACOSRC_PKG_DESC="Fast lexical analyzer generator"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr"

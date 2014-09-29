@@ -1,0 +1,8 @@
+
+( cd $DRACOSRC_PKG/usr ;
+  mv share/man .
+  rm -rf share
+)
+( cd $DRACOSRC_PKG/etc/lvm ;
+  mv lvm.conf lvm.conf.new
+)

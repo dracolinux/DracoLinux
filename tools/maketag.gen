@@ -1,0 +1,26 @@
+#!/bin/sh
+# maketag.gen
+# Ole Andre Rodlie <olear@dracolinux.org>
+
+if [ -a tagfile ]; then
+  rm -f tagfile
+fi
+if [ -a maketag ]; then
+  rm -f maketag
+fi
+if [ -a maketag.ez ]; then
+  rm -f maketag.ez
+fi
+
+for package in *.txz; do
+  NAME=`tar -O -xJf $package install/slack-desc | grep -E '\w+\:' | grep -v '^#' | sed 1q | sed 's/:[^)]*//g;s/)//g'`
+  echo "$NAME: ADD" >> tagfile
+  echo "\"$NAME\" \"$NAME\" \"on\" \\" >> maketag.pkg1
+  echo "$NAME \\" >> maketag.pkg2
+done
+
+cat maketag.1 maketag.pkg1 maketag.2 maketag.pkg2 maketag.3 maketag.pkg2 maketag.4 > maketag
+cp maketag maketag.ez
+
+rm -f maketag.pkg1
+rm -f maketag.pkg2

@@ -1,0 +1,30 @@
+--- ./libltdl/ltmain.sh.orig	2005-12-18 16:14:54.000000000 -0600
++++ ./libltdl/ltmain.sh	2007-02-16 18:45:48.000000000 -0600
+@@ -2892,9 +2892,9 @@
+ 		    $echo "$modename: \`$deplib' is not a valid libtool archive" 1>&2
+ 		    exit $EXIT_FAILURE
+ 		  fi
+-		  if test "$absdir" != "$libdir"; then
+-		    $echo "$modename: warning: \`$deplib' seems to be moved" 1>&2
+-		  fi
++		  #if test "$absdir" != "$libdir"; then
++		  #  $echo "$modename: warning: \`$deplib' seems to be moved" 1>&2
++		  #fi
+ 		  path="$absdir"
+ 		fi
+ 		depdepl=
+--- ./ltmain.sh.orig	2005-12-18 16:14:54.000000000 -0600
++++ ./ltmain.sh	2007-02-16 18:46:40.000000000 -0600
+@@ -2892,9 +2892,9 @@
+ 		    $echo "$modename: \`$deplib' is not a valid libtool archive" 1>&2
+ 		    exit $EXIT_FAILURE
+ 		  fi
+-		  if test "$absdir" != "$libdir"; then
+-		    $echo "$modename: warning: \`$deplib' seems to be moved" 1>&2
+-		  fi
++		  #if test "$absdir" != "$libdir"; then
++		  #  $echo "$modename: warning: \`$deplib' seems to be moved" 1>&2
++		  #fi
+ 		  path="$absdir"
+ 		fi
+ 		depdepl=

@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="binutils"
+DRACOSRC_PKG_VERSION="2.18"
+DRACOSRC_PKG_BUILD=22
+DRACOSRC_PKG_DESC="GNU binary development tools"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --enable-shared --enable-targets=$DRACOSRC_ARCH-draco-linux --enable-64-bit-bfd --build=$DRACOSRC_ARCH-draco-linux"

@@ -1,0 +1,6 @@
+DRACOSRC_PKG_NAME="grep"
+DRACOSRC_PKG_VERSION="2.5.1"
+DRACOSRC_PKG_ALT_VERSION="${DRACOSRC_PKG_VERSION}a"
+DRACOSRC_PKG_BUILD=9
+DRACOSRC_PKG_DESC="A string search utility"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --bindir=/bin --mandir=/usr/man --infodir=/usr/info"

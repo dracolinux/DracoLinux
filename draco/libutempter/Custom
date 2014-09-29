@@ -1,0 +1,6 @@
+CFLAGS="$DRACOSRC_FLAGS" CXXFLAGS="$DRACOSRC_FLAGS" make || exit 1
+make install DESTDIR=$DRACOSRC_PKG || exit 1
+rm -r $DRACOSRC_PKG/usr/lib/libutempter.a || exit 1
+chown root:utmp $DRACOSRC_PKG/usr/lib/utempter/utempter || exit 1
+chmod 2755 $DRACOSRC_PKG/usr/lib/utempter/utempter || exit 1
+chmod 644 $DRACOSRC_PKG/usr/include/utempter.h || exit 1

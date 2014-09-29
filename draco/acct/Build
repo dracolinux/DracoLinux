@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME=acct
+DRACOSRC_PKG_VERSION="6.5.5"
+DRACOSRC_PKG_BUILD=9
+DRACOSRC_PKG_DESC="process accounting utilities"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --infodir=/usr/info --mandir=/usr/man"

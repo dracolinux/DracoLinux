@@ -1,0 +1,15 @@
+make || exit 1
+mkdir -p $DRACOSRC_PKG/sbin
+cat portmap > $DRACOSRC_PKG/sbin/rpc.portmap || exit 1
+mkdir -p $DRACOSRC_PKG/usr/sbin
+cat pmap_dump > $DRACOSRC_PKG/usr/sbin/pmap_dump || exit 1
+cat pmap_set > $DRACOSRC_PKG/usr/sbin/pmap_set || exit 1
+chmod 755 $DRACOSRC_PKG/usr/sbin/* $DRACOSRC_PKG/sbin/* || exit 1
+mkdir -p $DRACOSRC_PKG/usr/man/man8
+for file in *.8 ; do
+  cat ${file} > $DRACOSRC_PKG/usr/man/man8/${file} || exit 1
+done
+( cd $DRACOSRC_PKG/usr/man/man8 ; ln -sf portmap.8 rpc.portmap.8 )
+mkdir -p $DRACOSRC_PKG/etc/rc.d
+cat $DRACOSRC_PKG_SRC_DIR/rc.rpc > $DRACOSRC_PKG/etc/rc.d/rc.rpc.new || exit 1
+chmod 644 $DRACOSRC_PKG/etc/rc.d/rc.rpc.new || exit 1

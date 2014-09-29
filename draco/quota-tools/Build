@@ -1,0 +1,7 @@
+DRACOSRC_PKG_NAME="quota-tools"
+DRACOSRC_PKG_ALT_NAME="quota-"
+DRACOSRC_PKG_VERSION="3.15"
+DRACOSRC_PKG_ALT_PKG_SRC="${DRACOSRC_PKG_NAME}"
+DRACOSRC_PKG_BUILD=7
+DRACOSRC_PKG_DESC="Linux disk quota utillities"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --mandir=/usr/man --sysconfdir=/etc $DRACOSRC_ARCH-draco-linux"

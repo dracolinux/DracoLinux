@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME=libnbcompat
+DRACOSRC_PKG_VERSION=20120702
+DRACOSRC_PKG_BUILD=6
+DRACOSRC_PKG_DESC="NetBSD compatibility library"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --enable-bsd-getopt --enable-db"

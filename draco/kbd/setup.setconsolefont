@@ -1,0 +1,3 @@
+#!/bin/sh
+#BLURB="Select a font for the console"
+sh usr/bin/setconsolefont $*

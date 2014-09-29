@@ -1,0 +1,11 @@
+--- soundon.orig	2012-12-21 03:35:28.161397924 +0100
++++ soundon	2012-12-21 03:36:53.474331364 +0100
+@@ -82,7 +82,7 @@
+ then
+ 	NOTIFY=1
+ 	echo Relinking OSS kernel modules for \"$KERNEL_VERMAGIC\"
+-	echo This may take few moments - please stand by...
++	echo This may take a while - please wait ...
+ 	echo Relinking OSS kernel modules for $KERNEL_VERMAGIC >> $LOG
+ 
+ 	rm -f /var/log/relink.log

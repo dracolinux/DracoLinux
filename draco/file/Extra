@@ -1,0 +1,5 @@
+rm -f $DRACOSRC_PKG/etc/file/magic.mgc $DRACOSRC_PKG/etc/file/magic.mime.mgc || exit 1
+
+( cd $DRACOSRC_PKG/etc
+  ln -sf file/magic magic
+)

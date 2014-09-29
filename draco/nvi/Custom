@@ -1,0 +1,4 @@
+cd build.unix || exit 1
+CFLAGS=$DRACOSRC_FLAGS ../dist/configure $DRACOSRC_PKG_CONFIGURE || exit 1
+make || exit 1
+make install DESTDIR=$DRACOSRC_PKG || exit 1

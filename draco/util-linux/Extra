@@ -1,0 +1,13 @@
+
+rm -f ${DRACOSRC_PKG}/usr/bin/sed || exit 1
+( cd $DRACOSRC_PKG;
+  mv bin/{mount,umount} sbin/
+  ( cd bin ;
+    ln -sf ../sbin/mount mount
+    ln -sf ../sbin/umount umount
+  )
+  mv usr/bin/setterm bin/
+  ( cd usr/bin ; ln -sf ../../bin/setterm setterm )
+  mv usr/share/man usr/
+  mv usr/share/info usr/
+)

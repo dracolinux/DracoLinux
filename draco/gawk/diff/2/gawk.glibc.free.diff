@@ -1,0 +1,94 @@
+
+      From: Aharon Robbins                                                   
+   Subject: Re: [gawk 3.1.5] *** glibc detected *** free(): invalid pointer: 
+      Date: Fri, 20 Jan 2006 13:56:06 +0200                                  
+
+     ----------------------------------------------------------------------------------------------------------------------
+
+ Greetings. Re this:
+
+ > Date: Thu, 19 Jan 2006 23:23:28 +0100
+ > From: Thomas Preissler <address@hidden>
+ > Subject: [gawk 3.1.5] *** glibc detected *** free(): invalid pointer:
+ > To: address@hidden
+ >
+ > Hello folks,
+ >
+ > I found a strange error using (g)awk 3.1.5:
+ >
+ > Any statement with gawk searching/checking a non existing file results
+ > in
+ >
+ > $ gawk '{ sum += $1 }; END { print sum }' file
+ > *** glibc detected *** free(): invalid pointer: 0x080923a0 ***
+ > zsh: abort      gawk '{ sum += $1 }; END { print sum }' file
+ >
+ > Dont hesitate to ask for any further questions. Thank you very much, I'll
+ > appreciate it very much.
+ >
+ >
+ > System: Debian testing, quite fresh, I update at about every 2 weeks.
+ > Kernel: 2.6.15 - Patches: mISDN (+zaptel... running asterisk)
+ >
+ > address@hidden:~/tmp> /lib/libc-2.3.5.so
+ > GNU C Library stable release version 2.3.5, by Roland McGrath et al.
+ > Copyright (C) 2005 Free Software Foundation, Inc.
+ > This is free software; see the source for copying conditions.
+ > There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+ > PARTICULAR PURPOSE.
+ > Compiled by GNU CC version 4.0.3 20051201 (prerelease) (Debian 4.0.2-5).
+ > Compiled on a Linux 2.6.13 system on 2006-01-02.
+ > Available extensions:
+ >         GNU libio by Per Bothner
+ >         crypt add-on version 2.1 by Michael Glad and others
+ >         GNU Libidn by Simon Josefsson
+ >         linuxthreads-0.10 by Xavier Leroy
+ >         BIND-8.2.3-T5B
+ >         libthread_db work sponsored by Alpha Processor Inc
+ >         NIS(YP)/NIS+ NSS modules 0.19 by Thorsten Kukuk
+ > Thread-local storage support included.
+ > For bug reporting instructions, please see:
+ > <http://www.gnu.org/software/libc/bugs.html>.
+ >
+ > Greets,
+ > Thomas
+
+ This is a known problem. The fix is attached. Thanks for the report!
+
+ Arnold
+ ----------------------------
+ Fri Aug 12 13:10:33 2005  Arnold D. Robbins  <address@hidden>
+
+         * io.c (iop_alloc): Only free `iop' if it was malloc'ed in
+         the first place.
+
+ --- ../gawk-3.1.5/io.c  2005-07-26 21:07:43.000000000 +0300
+ +++ io.c        2005-08-12 13:10:28.000000000 +0300
+ @@ -2480,9 +2480,12 @@
+  {
+         struct stat sbuf;
+         struct open_hook *oh;
+ +       int iop_malloced = FALSE;
+ 
+ -       if (iop == NULL)
+ +       if (iop == NULL) {
+                 emalloc(iop, IOBUF *, sizeof(IOBUF), "iop_alloc");
+ +               iop_malloced = TRUE;
+ +       }
+         memset(iop, '\0', sizeof(IOBUF));
+         iop->flag = 0;
+         iop->fd = fd;
+ @@ -2495,7 +2498,8 @@
+         }
+ 
+         if (iop->fd == INVALID_HANDLE) {
+ -               free(iop);
+ +               if (iop_malloced)
+ +                       free(iop);
+                 return NULL;
+         }
+         if (isatty(iop->fd))
+
+
+
+

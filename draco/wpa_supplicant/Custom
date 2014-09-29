@@ -1,0 +1,57 @@
+
+cat $DRACOSRC_PKG_SRC_DIR/config > .config || exit 1
+
+make || exit 1
+
+pushd doc/docbook
+if ! ls *.? >/dev/null 2>&1 ; then
+  make man || exit 1
+fi
+popd
+
+mkdir -p $DRACOSRC_PKG/usr/sbin
+cp wpa_supplicant wpa_passphrase wpa_cli $DRACOSRC_PKG/usr/sbin/
+chmod 755 $DRACOSRC_PKG/usr/sbin/*
+
+for m in 5 8; do
+  mkdir -p $DRACOSRC_PKG/usr/man/man${m}
+  cp doc/docbook/*.${m} $DRACOSRC_PKG/usr/man/man${m}/ || exit 1
+done
+
+mkdir -p $DRACOSRC_PKG/etc
+cp wpa_supplicant.conf $DRACOSRC_PKG/etc/wpa_supplicant.conf.sample || exit 1
+cat <<-_EOT_ > $DRACOSRC_PKG/etc/wpa_supplicant.conf.new
+	# See /usr/doc/${PRGNAM}-${VERSION}/wpa_supplicant.conf.sample
+	# for many more options that you can use in this file.
+	
+	# This line enables the use of wpa_cli which is used by rc.wireless
+	# if possible (to check for successful association)
+	ctrl_interface=/var/run/wpa_supplicant
+	# By default, only root (group 0) may use wpa_cli
+	ctrl_interface_group=0
+	eapol_version=1
+	ap_scan=1
+	fast_reauth=1
+	
+	# WPA protected network, supply your own ESSID and WPAPSK here:
+	network={
+	  scan_ssid=0
+	  ssid="your_essid_here"
+	  proto=WPA
+	  key_mgmt=WPA-PSK
+	  pairwise=CCMP TKIP
+	  group=CCMP TKIP WEP104 WEP40
+	  psk=your_psk_here
+	}
+	
+	# Plaintext connection (no WPA, no IEEE 802.1X),
+	# nice for hotel/airport types of WiFi network.
+	# You'll need a recent version of wireless-tools for this!
+	network={
+	  ssid="any"
+	  key_mgmt=NONE
+	  priority=2
+	}
+	_EOT_
+
+chmod 600 $DRACOSRC_PKG/etc/wpa_supplicant.conf.new || exit 1

@@ -1,0 +1,2 @@
+make install-libs DESTDIR=$DRACOSRC_PKG || exit 1
+( cd $DRACOSRC_PKG/etc ; mv mke2fs.conf mke2fs.conf.new )

@@ -1,0 +1,1 @@
+( cd $DRACOSRC_PKG/usr/bin ; ln -sf flex lex )

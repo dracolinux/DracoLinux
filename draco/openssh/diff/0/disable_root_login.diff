@@ -1,0 +1,11 @@
+--- sshd_config.orig	2009-02-16 04:12:10.247629780 +0100
++++ sshd_config	2009-02-16 04:12:26.510636763 +0100
+@@ -38,7 +38,7 @@
+ # Authentication:
+ 
+ #LoginGraceTime 2m
+-#PermitRootLogin yes
++PermitRootLogin no
+ #StrictModes yes
+ #MaxAuthTries 6
+ #MaxSessions 10

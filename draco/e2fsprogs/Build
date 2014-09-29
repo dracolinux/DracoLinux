@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="e2fsprogs"
+DRACOSRC_PKG_VERSION="1.41.14"
+DRACOSRC_PKG_BUILD=6
+DRACOSRC_PKG_DESC="Ext2 filesystem utilities"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --with-root-prefix="" --enable-elf-shlibs --mandir=/usr/man --enable-dynamic-e2fsck --infodir=/usr/info --includedir=/usr/include --datadir=/usr/share --docdir=/usr/doc/${DRACOSRC_PKG_NAME}-${DRACOSRC_PKG_VERSION}"

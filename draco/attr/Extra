@@ -1,0 +1,11 @@
+
+make install-dev DESTDIR=$DRACOSRC_PKG || exit 1
+make install-lib DESTDIR=$DRACOSRC_PKG || exit 1
+
+mv $DRACOSRC_PKG/usr/share/doc $DRACOSRC_PKG/usr || exit 1
+( cd $DRACOSRC_PKG/usr/doc ; mv $DRACOSRC_PKG_NAME $DRACOSRC_PKG_NAME-$DRACOSRC_PKG_VERSION )
+rm -rf $DRACOSRC_PKG/usr/doc/$DRACOSRC_PKG_NAME-$DRACOSRC_PKG_VERSION/ea-conv || exit 1
+strip -g $DRACOSRC_PKG/usr/lib/*.a
+rm -f $DRACOSRC_PKG/lib/*.a $DRACOSRC_PKG/lib/libattr.so $DRACOSRC_PKG/lib/*.la $DRACOSRC_PKG/usr/lib/*.la || exit 1
+( cd $DRACOSRC_PKG/usr/lib ; rm -f libattr.so ; ln -sf /lib/libattr.so.1 libattr.so )
+chmod 755 $DRACOSRC_PKG/lib/*

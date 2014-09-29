@@ -1,0 +1,30 @@
+
+make || exit 1
+
+mkdir -p $DRACOSRC_PKG/sbin || exit 1
+cp -a ifrename iwconfig iwevent iwgetid iwlist iwpriv iwspy $DRACOSRC_PKG/sbin || exit 1
+chmod 755 $PKG/sbin/*
+
+mkdir -p $DRACOSRC_PKG/usr/lib || exit 1
+cp -a libiw.a $DRACOSRC_PKG/usr/lib || exit 1
+
+mkdir -p $DRACOSRC_PKG/usr/include || exit 1
+cp -a iwlib.h wireless.h $DRACOSRC_PKG/usr/include || exit 1
+chmod 644 $DRACOSRC_PKG/usr/include/*.h
+
+mkdir -p $DRACOSRC_PKG/usr/man/man5 || exit 1
+cat iftab.5 > $DRACOSRC_PKG/usr/man/man5/iftab.5 || exit 1
+mkdir -p $DRACOSRC_PKG/usr/man/man7 || exit 1
+cat wireless.7 > $DRACOSRC_PKG/usr/man/man7/wireless.7 || exit 1
+mkdir -p $DRACOSRC_PKG/usr/man/man8 || exit 1
+for file in *.8 ; do
+  cat $file > $DRACOSRC_PKG/usr/man/man8/$file || exit 1
+done
+
+mkdir -p $DRACOSRC_PKG/etc/rc.d || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/rc.wireless > $DRACOSRC_PKG/etc/rc.d/rc.wireless.new || exit 1
+chmod 755 $DRACOSRC_PKG/etc/rc.d/rc.wireless.new || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/rc.wireless.conf > $DRACOSRC_PKG/etc/rc.d/rc.wireless.conf.new || exit 1
+chmod 600 $DRACOSRC_PKG/etc/rc.d/rc.wireless.conf.new || exit 1
+
+

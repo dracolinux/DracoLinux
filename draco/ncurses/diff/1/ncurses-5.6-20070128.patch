@@ -1,0 +1,109 @@
+# ncurses 5.6 - patch 20070128 - Thomas E. Dickey
+#
+# ------------------------------------------------------------------------------
+#
+# Ncurses 5.6 is at
+# 	ftp.gnu.org:/pub/gnu
+#
+# Patches for ncurses 5.6 are in the subdirectory
+# 	ftp://invisible-island.net/ncurses/5.6
+#
+# ------------------------------------------------------------------------------
+# patch by Thomas E. Dickey <dickey@invisible-island.net>
+# created  Sun Jan 28 17:23:09 UTC 2007
+# ------------------------------------------------------------------------------
+# NEWS       |    6 +++++-
+# aclocal.m4 |    6 +++---
+# configure  |    2 +-
+# dist.mk    |    4 ++--
+# 4 files changed, 11 insertions(+), 7 deletions(-)
+# ------------------------------------------------------------------------------
+Index: NEWS
+Prereq:  1.1073 
+--- ncurses-5.6-20070127+/NEWS	2007-01-28 00:38:53.000000000 +0000
++++ ncurses-5.6-20070128/NEWS	2007-01-28 16:55:02.000000000 +0000
+@@ -25,7 +25,7 @@
+ -- sale, use or other dealings in this Software without prior written        --
+ -- authorization.                                                            --
+ -------------------------------------------------------------------------------
+--- $Id: NEWS,v 1.1073 2007/01/28 00:38:53 tom Exp $
++-- $Id: NEWS,v 1.1074 2007/01/28 16:55:02 tom Exp $
+ -------------------------------------------------------------------------------
+ 
+ This is a log of changes that ncurses has gone through since Zeyd started
+@@ -45,6 +45,10 @@
+ Changes through 1.9.9e did not credit all contributions;
+ it is not possible to add this information.
+ 
++20070128
++	+ fix typo in configure script that broke --with-termlib option
++	  (report by Rong-En Fan).
++
+ 20070127
+ 	+ improve fix for FreeBSD gnu/98975, to allow for null pointer passed
+ 	  to tgetent() (report by Rong-en Fan).
+Index: aclocal.m4
+Prereq:  1.414 
+--- ncurses-5.6-20070127+/aclocal.m4	2007-01-27 22:53:29.000000000 +0000
++++ ncurses-5.6-20070128/aclocal.m4	2007-01-28 16:51:41.000000000 +0000
+@@ -28,7 +28,7 @@
+ dnl
+ dnl Author: Thomas E. Dickey 1995-on
+ dnl
+-dnl $Id: aclocal.m4,v 1.414 2007/01/27 22:53:29 tom Exp $
++dnl $Id: aclocal.m4,v 1.415 2007/01/28 16:51:41 tom Exp $
+ dnl Macros used in NCURSES auto-configuration script.
+ dnl
+ dnl These macros are maintained separately from NCURSES.  The copyright on
+@@ -1852,7 +1852,7 @@
+ 	AC_SUBST(LIB_PREFIX)
+ ])dnl
+ dnl ---------------------------------------------------------------------------
+-dnl CF_LIB_RULES version: 43 updated: 2007/01/13 14:44:50
++dnl CF_LIB_RULES version: 44 updated: 2007/01/28 11:40:44
+ dnl ------------
+ dnl Append definitions and rules for the given models to the subdirectory
+ dnl Makefiles, and the recursion rule for the top-level Makefile.  If the
+@@ -1986,7 +1986,7 @@
+ 				case $cf_subset in
+ 				*base*)
+ 					;;
+-				termlib*)
++				*termlib*)
+ 					cf_libname=$TINFO_LIB_SUFFIX
+ 					if test -n "${DFT_ARG_SUFFIX}" ; then
+ 						# undo $LIB_SUFFIX add-on in CF_LIB_SUFFIX
+Index: configure
+--- ncurses-5.6-20070127+/configure	2007-01-27 22:49:10.000000000 +0000
++++ ncurses-5.6-20070128/configure	2007-01-28 17:00:26.000000000 +0000
+@@ -16640,7 +16640,7 @@
+ 				case $cf_subset in
+ 				*base*)
+ 					;;
+-				termlib*)
++				*termlib*)
+ 					cf_libname=$TINFO_LIB_SUFFIX
+ 					if test -n "${DFT_ARG_SUFFIX}" ; then
+ 						# undo $LIB_SUFFIX add-on in CF_LIB_SUFFIX
+Index: dist.mk
+Prereq:  1.574 
+--- ncurses-5.6-20070127+/dist.mk	2007-01-27 15:54:59.000000000 +0000
++++ ncurses-5.6-20070128/dist.mk	2007-01-28 14:27:25.000000000 +0000
+@@ -25,7 +25,7 @@
+ # use or other dealings in this Software without prior written               #
+ # authorization.                                                             #
+ ##############################################################################
+-# $Id: dist.mk,v 1.574 2007/01/27 15:54:59 tom Exp $
++# $Id: dist.mk,v 1.575 2007/01/28 14:27:25 tom Exp $
+ # Makefile for creating ncurses distributions.
+ #
+ # This only needs to be used directly as a makefile by developers, but
+@@ -37,7 +37,7 @@
+ # These define the major/minor/patch versions of ncurses.
+ NCURSES_MAJOR = 5
+ NCURSES_MINOR = 6
+-NCURSES_PATCH = 20070127
++NCURSES_PATCH = 20070128
+ 
+ # We don't append the patch to the version, since this only applies to releases
+ VERSION = $(NCURSES_MAJOR).$(NCURSES_MINOR)

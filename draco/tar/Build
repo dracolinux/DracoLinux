@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="tar"
+DRACOSRC_PKG_VERSION="1.22"
+DRACOSRC_PKG_BUILD=7
+DRACOSRC_PKG_DESC="Utility used to store, backup, and transport files"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --infodir=/usr/info --enable-backup-scripts $DRACOSRC_ARCH-draco-linux"

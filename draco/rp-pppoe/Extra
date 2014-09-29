@@ -1,0 +1,5 @@
+( cd $DRACOSRC_PKG/etc/ppp
+  for config in firewall-masq firewall-standalone pppoe-server-options pppoe.conf ; do
+    mv $config ${config}.new
+  done
+)

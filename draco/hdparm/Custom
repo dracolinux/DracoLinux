@@ -1,0 +1,9 @@
+
+make || exit 1
+mkdir -p $DRACOSRC_PKG/sbin || exit 1
+make DESTDIR=$DRACOSRC_PKG install || exit 1
+install -m755 contrib/idectl $DRACOSRC_PKG/sbin || exit 1
+install -m755 contrib/ultrabayd $DRACOSRC_PKG/sbin || exit 1
+
+( cd $DRACOSRC_PKG/usr/share ; mv man ../ )
+rm -rf $DRACOSRC_PKG/usr/share

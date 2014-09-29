@@ -1,0 +1,5 @@
+DRACOSRC_PKG_NAME="findutils"
+DRACOSRC_PKG_VERSION="4.2.33"
+DRACOSRC_PKG_BUILD=8
+DRACOSRC_PKG_DESC="Utilities to locate files"
+DRACOSRC_PKG_CONFIGURE="--prefix=/usr --mandir=/usr/man --infodir=/usr/info --disable-locate --build=$DRACOSRC_ARCH-draco-linux"

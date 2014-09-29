@@ -1,0 +1,11 @@
+--- ./Makefile.orig	2003-02-21 14:39:36.000000000 -0800
++++ ./Makefile	2003-02-21 14:39:51.000000000 -0800
+@@ -10,7 +10,7 @@
+ #SUFFIX=-pre2
+ DATE=2003-01-04
+ 
+-PREFIX=/usr/local
++PREFIX=/usr
+ SBINDIR=$(PREFIX)/sbin
+ SHAREDIR=$(PREFIX)/share
+ MANDIR=$(shell if [ -d $(PREFIX)/share/man ] ; then echo $(PREFIX)/share/man ; else echo $(PREFIX)/man ; fi)

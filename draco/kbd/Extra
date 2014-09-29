@@ -1,0 +1,19 @@
+
+( cd $DRACOSRC_PKG/usr ; mv share/man . )
+( cd $DRACOSRC_PKG/usr/bin ; rm -f loadkeys ; ln -sf ../../bin/loadkeys . )
+
+mkdir -p $DRACOSRC_PKG/var/log/setup || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/setup.setconsolefont > $DRACOSRC_PKG/var/log/setup/setup.setconsolefont || exit 1
+chmod 755 $DRACOSRC_PKG/var/log/setup/setup.setconsolefont
+cat $DRACOSRC_PKG_SRC_DIR/setconsolefont > $DRACOSRC_PKG/usr/bin/setconsolefont || exit 1
+chmod 755 $DRACOSRC_PKG/usr/bin/setconsolefont
+
+mkdir -p $DRACOSRC_PKG/etc/rc.d || exit 1
+cat << EOF > $DRACOSRC_PKG/etc/rc.d/rc.font
+#!/bin/sh
+#
+# This selects your default screen font from among the ones in
+# /usr/share/kbd/consolefonts.
+#
+setfont -v
+EOF

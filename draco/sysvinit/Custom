@@ -1,0 +1,39 @@
+cd src || exit 1
+CFLAGS="$DRACOSRC_CFLAGS" make clobber || exit 1
+CFLAGS="$DRACOSRC_CFLAGS" make || exit 1
+
+mkdir -p $DRACOSRC_PKG/sbin
+for program in bootlogd halt init killall5 shutdown runlevel ; do
+  strip --strip-unneeded $program
+  cat $program > $DRACOSRC_PKG/sbin/$program
+  chmod 755 $DRACOSRC_PKG/sbin/$program
+  chown root:root $DRACOSRC_PKG/sbin/$program
+done
+mkdir -p $DRACOSRC_PKG/usr/bin
+for program in last mountpoint ; do
+  strip --strip-unneeded $program
+  cat $program > $DRACOSRC_PKG/usr/bin/$program
+  chmod 755 $DRACOSRC_PKG/usr/bin/$program
+  chown root:root $DRACOSRC_PKG/usr/bin/$program
+done
+( cd $DRACOSRC_PKG/usr/bin ; ln -sf last lastb )
+mv $DRACOSRC_PKG/sbin/init $DRACOSRC_PKG/sbin/init.new
+chmod 755 $DRACOSRC_PKG/sbin/init.new
+chown root:root $DRACOSRC_PKG/sbin/init.new
+
+cp initscript.sample $DRACOSRC_PKG/sbin/initscript.sample
+
+cd ../man
+mkdir -p $DRACOSRC_PKG/usr/man/man{1,5,8}
+for page in last.1 mountpoint.1 ; do
+  cat $page > $DRACOSRC_PKG/usr/man/man1/$page
+done
+for page in inittab.5 initscript.5 ; do
+  cat $page > $DRACOSRC_PKG/usr/man/man5/$page
+done
+for page in halt.8 init.8 killall5.8 pidof.8 poweroff.8 reboot.8 runlevel.8 \
+  shutdown.8 telinit.8 bootlogd.8 ; do
+  cat $page > $DRACOSRC_PKG/usr/man/man8/$page
+done
+( cd $DRACOSRC_PKG/usr/man/man1 ; ln -sf last.1 lastb.1 )
+

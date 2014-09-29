@@ -1,0 +1,22 @@
+--- ./Makefile.am.orig	2007-03-01 18:14:25.000000000 -0600
++++ ./Makefile.am	2007-06-04 21:42:41.000000000 -0500
+@@ -3,7 +3,7 @@
+ 
+ EXTRA_DIST = COPYING ChangeLog TODO install-sh config.h.in stamp-h.in \
+ 		THANKS config.rpath import-gnulib.sh import-gnulib.config
+-SUBDIRS = gnulib lib find xargs locate doc po m4
++SUBDIRS = gnulib lib find xargs doc po m4
+ 
+ ACLOCAL_AMFLAGS = -I gnulib/m4 -I m4
+ 
+--- ./Makefile.in.orig	2007-05-30 15:06:20.000000000 -0500
++++ ./Makefile.in	2007-06-04 21:43:04.000000000 -0500
+@@ -428,7 +428,7 @@
+ EXTRA_DIST = COPYING ChangeLog TODO install-sh config.h.in stamp-h.in \
+ 		THANKS config.rpath import-gnulib.sh import-gnulib.config
+ 
+-SUBDIRS = gnulib lib find xargs locate doc po m4
++SUBDIRS = gnulib lib find xargs doc po m4
+ ACLOCAL_AMFLAGS = -I gnulib/m4 -I m4
+ all: config.h
+ 	$(MAKE) $(AM_MAKEFLAGS) all-recursive

@@ -1,0 +1,41 @@
+mkdir -p $DRACOSRC_PKG/etc/X11/app-defaults || exit 1
+cp -a src/devices/xditview/GXditview.ad $DRACOSRC_PKG/etc/X11/app-defaults/GXditview || exit 1
+
+rm -rf $DRACOSRC_PKG/usr/doc/groff-$DRACOSRC_PKG_VERSION/*.ps
+rm -rf $DRACOSRC_PKG/usr/doc/groff-$DRACOSRC_PKG_VERSION/examples
+rm -rf $DRACOSRC_PKG/usr/doc/groff-$DRACOSRC_PKG_VERSION/html
+rm -rf $DRACOSRC_PKG/usr/doc/groff-$DRACOSRC_PKG_VERSION/pdf
+
+cat $DRACOSRC_PKG_SRC_DIR/groff.man.mdoc.local >> $DRACOSRC_PKG/usr/share/groff/site-tmac/man.local || exit 1
+cat $DRACOSRC_PKG_SRC_DIR/groff.man.mdoc.local >> $DRACOSRC_PKG/usr/share/groff/site-tmac/mdoc.local || exit 1
+
+( cd $DRACOSRC_PKG ;
+  ( cd usr/bin ; rm -rf geqn )
+  ( cd usr/bin ; ln -sf eqn geqn )
+  ( cd usr/bin ; rm -rf gindxbib )
+  ( cd usr/bin ; ln -sf indxbib gindxbib )
+  ( cd usr/bin ; rm -rf gpic )
+  ( cd usr/bin ; ln -sf pic gpic )
+  ( cd usr/bin ; rm -rf grefer )
+  ( cd usr/bin ; ln -sf refer grefer )
+  ( cd usr/bin ; rm -rf gsoelim )
+  ( cd usr/bin ; ln -sf soelim gsoelim )
+  ( cd usr/bin ; rm -rf zsoelim )
+  ( cd usr/bin ; ln -sf soelim zsoelim )
+  ( cd usr/bin ; rm -rf gtbl )
+  ( cd usr/bin ; ln -sf tbl gtbl )
+  ( cd usr/bin ; rm -rf gtroff )
+  ( cd usr/bin ; ln -sf troff gtroff )
+  ( cd usr/bin ; rm -rf glookbib )
+  ( cd usr/bin ; ln -sf lookbib glookbib )
+  ( cd usr/bin ; rm -rf gnroff )
+  ( cd usr/bin ; ln -sf nroff gnroff )
+  ( cd usr/bin ; rm -rf gneqn )
+  ( cd usr/bin ; ln -sf neqn gneqn )
+)
+
+( cd $DRACOSRC_PKG/usr/share/groff ;
+  ln -s ${DRACOSRC_PKG_VERSION}/eign eign
+  ln -s ${DRACOSRC_PKG_VERSION}/font font
+  ln -s ${DRACOSRC_PKG_VERSION}/tmac tmac
+)

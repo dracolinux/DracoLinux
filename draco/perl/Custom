@@ -1,0 +1,20 @@
+./Configure -de \
+  -Dprefix=/usr \
+  -Dcccdlflags='-fPIC' \
+  -Dinstallprefix=/usr \
+  -Doptimize="$DRACOSRC_FLAGS" \
+  -Dusethreads -Duseithreads \
+  -Dpager='/usr/bin/less -isr' \
+  -Dinc_version_list='5.8.7 5.8.6 5.8.5 5.8.4 5.8.3 5.8.2 5.8.1 5.8.0' \
+  -Darchname=$DRACOSRC_ARCH-draco-linux
+
+# Fix for GCC 4.2+
+cat makefile | grep -v '\<command-line\>' > foo
+mv foo makefile || exit 1
+cat x2p/makefile | grep -v '\<command-line\>' > foo
+mv foo x2p/makefile || exit 1
+
+make || exit 1
+make test 
+make install DESTDIR=$DRACOSRC_PKG
+
