@@ -1,4 +1,4 @@
-cp $DRACOSRC_DIR/common/linux26/logo_linux_clut224.ppm drivers/video/logo/ || exit 1
+cp $DRACOSRC_DIR/common/linux32/logo_linux_clut224.ppm drivers/video/logo/ || exit 1
 
 if [ -f $DRACOSRC_DIR/common/linux32/$KERNEL_CONFIG ]; then
   cat $DRACOSRC_DIR/common/linux32/$KERNEL_CONFIG >.config || exit 1

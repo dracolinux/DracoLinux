@@ -1,0 +1,6 @@
+$RUN ${DRACOSRC_DIR}/common/linux32/Build
+DRACOSRC_PKG_NAME=kernel-atom
+DRACOSRC_PKG_DESC="The Linux kernel v3.2 (Atom)"
+DRACOSRC_PKG_BUILD=1
+KERNEL_CONFIG=config-atom
+LOCAL_KERNEL=-atom
