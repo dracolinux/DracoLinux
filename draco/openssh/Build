@@ -1,6 +1,6 @@
 DRACOSRC_PKG_NAME=openssh
-DRACOSRC_PKG_VERSION=6.1
+DRACOSRC_PKG_VERSION=6.6
 DRACOSRC_PKG_ALT_VERSION=${DRACOSRC_PKG_VERSION}p1
-DRACOSRC_PKG_BUILD=6
+DRACOSRC_PKG_BUILD=2
 DRACOSRC_PKG_DESC="Secure Shell daemon and clients"
 DRACOSRC_PKG_CONFIGURE="--prefix=/usr --mandir=/usr/man --sysconfdir=/etc/ssh --without-pam --with-md5-passwords --with-tcp-wrappers --with-default-path=/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin --with-ipv4-default --with-privsep-path=/var/empty --with-privsep-user=sshd --build=$DRACOSRC_ARCH-draco-linux"
