@@ -1,6 +1,6 @@
 DRACOSRC_PKG_NAME="cryptsetup"
-DRACOSRC_PKG_VERSION="1.0.6"
-DRACOSRC_PKG_BUILD=7
+DRACOSRC_PKG_VERSION="1.6.6"
+DRACOSRC_PKG_BUILD=1
 DRACOSRC_PKG_DESC="Userspace setup tool for transparent encryption of block devices"
 DRACOSRC_PKG_CONFIGURE="--prefix=/usr --mandir=/usr/man --enable-shared --disable-static $DRACOSRC_ARCH-draco-linux"
 DRACOSRC_PKG_CONFIGURE_STATIC="--prefix=/usr --mandir=/usr/man --disable-shared --enable-static $DRACISRC_ARCH-draco-linux"
