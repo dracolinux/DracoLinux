@@ -1,5 +1,5 @@
 DRACOSRC_PKG_NAME="gzip"
-DRACOSRC_PKG_VERSION="1.3.12"
-DRACOSRC_PKG_BUILD=7
+DRACOSRC_PKG_VERSION=1.6
+DRACOSRC_PKG_BUILD=1
 DRACOSRC_PKG_DESC="File compression utility"
 DRACOSRC_PKG_CONFIGURE="--prefix=/usr --bindir=/bin --mandir=/usr/man --infodir=/usr/info --build=$DRACOSRC_ARCH-draco-linux"
